@@ -1,0 +1,105 @@
+
+spring:
+  datasource:
+    driver-class-name: org.mariadb.jdbc.Driver
+    url: jdbc:mariadb://localhost:3306/pretchel1224?serverTimezone=Asia/Seoul
+    username: root
+    password: 1234
+  jpa:
+    open-in-view: true
+    hibernate:
+      ddl-auto: create
+      use-new-id-generate-mappings: false
+    show-sql: true
+    properties:
+      hibernate.format_sql: true
+  thymeleaf:
+    cache: false
+  mvc:
+    hiddenmethod:
+      filter:
+        enabled: true
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: 508669043384-ae54jj160edn1i6r2m27h1avfhn23m08.apps.googleusercontent.com
+            client-secret: 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
+            redirect-uri: "{baseUrl}/oauth2/callback/google"
+            scope:
+              - email
+              - profile
+          kakao:
+            client-id: ac101720e7bee0afcdaff13bc66a4b34
+            redirect-uri: "{baseUrl}/oauth2/callback/kakao"
+            authorization-grant-type: authorization_code
+            client-authentication-method: POST
+            scope: account_email
+            client-name: kakao
+        provider:
+          kakao:
+            authorization_uri: https://kauth.kakao.com/oauth/authorize
+            token_uri: https://kauth.kakao.com/oauth/token
+            user-info-uri: https://kapi.kakao.com/v2/user/me
+            user_name_attribute: id
+  redis:
+    host: localhost
+    port: 6379
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: vegielcl@gmail.com
+    password: tmvmfldaos24~
+    properties:
+      mail:
+        smtp:
+          starttls:
+            enable: true
+            required: true
+          auth: true
+          connectiontimeout: 5000
+          timeout: 5000
+          writetimeout: 5000
+
+jwt:
+  secret: 1249F49GFDJ345NGJK3458SXJ454321252VXAL10S752993RFV2AlDD2
+
+# authorizedRedirectUri: http://localhost:8080/oauth2/redirect
+
+server:
+  ssl:
+    key-store: classpath:keystore.p12
+    key-store-type: PKCS12
+    key-store-password: won297712
+    key-alias: tomcat
+  port: 8090
+  http2:
+    enabled: true
+
+openbanking:
+  client-id: 42e7f7cb-0754-40fe-af3c-93e140fe7af5
+  client-secret: 5335063d-78d8-41a1-b246-bc91be43b435
+  redirect-uri: https://localhost:8090/oauth2/openbanking/redirect
+  response-type: code
+  scope: login inquiry
+  state: 18694828348684123945868382492349
+  auth-type: 0
+  code-request-url: https://testapi.openbanking.or.kr/oauth/2.0/authorize
+  token-request-url:
+
+cloud:
+  aws:
+    credentials:
+      accessKey: AKIAWS6NJCT7ZU5SPYXC
+      secretKey: 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
+    s3:
+      bucket: pretchel-bucket2
+    region:
+      static: ap-northeast-2
+    stack:
+      auto: false
+
+import:
+  key: '0713949642152998'
+  secret: 4e6d503ac4e0c8ac8095420d7dcb5ebd82f3c2e106551f600fca3f1ca7d4aab9b31da2cf364d6603

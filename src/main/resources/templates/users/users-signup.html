@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <form id="form-signup">
+        <input type="text" id="email" name="email">
+        <input type="password" id="password" name="password">
+        <input type="checkbox" name="gender" value="female">
+        <input type="checkbox" name="gender" value="male">
+        <input type="checkbox" name="gender" value="hidden">
+        <input type="text" id="birthday" placeholder="생일">
+        <input type="text" id="phoneNumber" placeholder="폰번호">
+    </form>
+    <button id="btn-signup">회원가입</button>
+</body>
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<script th:src="@{/js/users.js}"></script>
+</html>

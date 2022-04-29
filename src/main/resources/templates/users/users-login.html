@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<form id="form-login" >
+    <input type="text" id="email" name="email" placeholder="이메일">
+    <input type="password" id="password" name="password">
+
+</form>
+<button id="btn-login">로그인</button>
+
+<a href="https://localhost:8090/oauth2/authorize/google?redirect_uri=https://localhost:8090/oauth2/redirect">구글 계정으로 로그인냥</a>
+<a href="https://localhost:8090/oauth2/authorize/kakao?redirect_uri=https://localhost:8090/oauth2/redirect">카카오로그인</a>
+
+</body>
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<script th:src="@{/js/users.js}"></script>
+</html>
