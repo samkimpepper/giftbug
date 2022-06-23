@@ -50,7 +50,7 @@ public class EventApiController {
                 System.out.println(key + ": " + val);
             }
         } catch (IllegalStateException ex) {
-            log.info("컨트롤러 페이지네이션 좆됨");
+            log.info("컨트롤러 페이지네이션 실패");
         }
 
         return profileService.findAllByOrderByCreateDate(page, PROFILES_PER_PAGE);
@@ -70,7 +70,6 @@ public class EventApiController {
     public ResponseEntity<?> deleteEvent(@PathVariable("id") String id) {
         return profileService.delete(id);
     }
-
 
 //    @PostMapping("/test")
 //    public void saveTest(ProfileRequestDto.Save save) {
