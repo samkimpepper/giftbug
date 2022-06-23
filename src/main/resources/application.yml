@@ -67,15 +67,15 @@ jwt:
 
 # authorizedRedirectUri: http://localhost:8080/oauth2/redirect
 
-server:
-  ssl:
-    key-store: classpath:keystore.p12
-    key-store-type: PKCS12
-    key-store-password: won297712
-    key-alias: tomcat
-  port: 8090
-  http2:
-    enabled: true
+#server:
+#  ssl:
+#    key-store: classpath:keystore.p12
+#    key-store-type: PKCS12
+#    key-store-password: won297712
+#    key-alias: tomcat
+#  port: 8090
+#  http2:
+#    enabled: true
 
 openbanking:
   client-id: 42e7f7cb-0754-40fe-af3c-93e140fe7af5

@@ -1,6 +1,6 @@
 package com.pretchel.pretchel0123jwt.config.jwt;
 
-import com.pretchel.pretchel0123jwt.v1.dto.user.UserResponseDto;
+import com.pretchel.pretchel0123jwt.v1.account.dto.user.UserResponseDto;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -13,7 +13,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.oauth2.jwt.JwtDecoders;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;

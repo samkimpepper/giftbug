@@ -1,21 +1,13 @@
 package com.pretchel.pretchel0123jwt;
 
-import com.pretchel.pretchel0123jwt.entity.Authority;
-import com.pretchel.pretchel0123jwt.entity.Users;
-import com.pretchel.pretchel0123jwt.v1.controller.api.UsersApiController;
-import com.pretchel.pretchel0123jwt.v1.dto.user.UserRequestDto;
-import com.pretchel.pretchel0123jwt.v1.service.UsersService;
+import com.pretchel.pretchel0123jwt.v1.account.controller.UsersApiController;
+import com.pretchel.pretchel0123jwt.v1.account.dto.user.UserRequestDto;
+import com.pretchel.pretchel0123jwt.v1.account.service.UsersService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Collections;
-import java.util.Date;
 
 @SpringBootTest
 @WebMvcTest(controllers = UsersApiController.class)
