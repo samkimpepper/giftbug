@@ -1,13 +1,17 @@
 package com.pretchel.pretchel0123jwt.v1.account.service;
 
 import com.pretchel.pretchel0123jwt.config.jwt.JwtTokenProvider;
+import com.pretchel.pretchel0123jwt.global.ResponseDto;
+import com.pretchel.pretchel0123jwt.global.exception.NotFoundException;
 import com.pretchel.pretchel0123jwt.util.CookieUtils;
-import com.pretchel.pretchel0123jwt.v1.account.domain.Account;
+import com.pretchel.pretchel0123jwt.v1.account.dto.user.UserEventsDto;
+import com.pretchel.pretchel0123jwt.v1.event.domain.Account;
 import com.pretchel.pretchel0123jwt.v1.account.domain.Authority;
 import com.pretchel.pretchel0123jwt.v1.account.domain.ConfirmPasswordCode;
 import com.pretchel.pretchel0123jwt.v1.account.domain.Users;
 import com.pretchel.pretchel0123jwt.v1.account.dto.account.AccountRequestDto;
-import com.pretchel.pretchel0123jwt.v1.account.repository.AccountRepository;
+import com.pretchel.pretchel0123jwt.v1.event.domain.Event;
+import com.pretchel.pretchel0123jwt.v1.event.repository.AccountRepository;
 import com.pretchel.pretchel0123jwt.v1.account.repository.UsersRepository;
 import com.pretchel.pretchel0123jwt.v1.event.domain.Address;
 import com.pretchel.pretchel0123jwt.v1.event.dto.address.AddressRequestDto;
@@ -39,6 +43,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import static com.pretchel.pretchel0123jwt.v1.oauth2.service.HttpCookieOAuth2AuthorizationRequestRepository.REFRESH_TOKEN;
 
@@ -60,14 +65,9 @@ public class UsersService {
 
     @Transactional
     public Users getUsersByEmail(UserDetails userDetails) {
-        String email = userDetails.getUsername();
+        String email = Optional.ofNullable(userDetails.getUsername()).orElseThrow(NotFoundException::new);
 
-        Optional<Users> usersOptional = usersRepository.findByEmail(email);
-        if(usersOptional.isPresent()) {
-            return usersOptional.get();
-        } else {
-            return null;
-        }
+        return usersRepository.findByEmail(email).orElseThrow(NotFoundException::new);
     }
 
     @Transactional
@@ -224,30 +224,22 @@ public class UsersService {
         return responseDto.success("로그아웃 완료");
     }
 
-    public ResponseEntity<?> getUserProfile(@AuthenticationPrincipal UserDetails userDetails) {
+    public List<UserEventsDto> getUserEvents(@AuthenticationPrincipal UserDetails userDetails) {
         Users users = getUsersByEmail(userDetails);
-        if(users == null) {
-            return responseDto.fail("해당하는 유저가 존재하지 않는다능", HttpStatus.BAD_REQUEST);
-        }
 
         List<EventMapping> profiles = profileRepository.findProfilesByUserId(users);
 
-        List<Object> data = new ArrayList<>();
+        List<Event> events = profileRepository.findAllByUsers(users);
 
-        UserResponseDto.UserInfo userInfo = new UserResponseDto.UserInfo(users.getEmail(), users.getBirthday());
-        data.add(userInfo);
-        data.add(profiles);
-
-        return responseDto.success(data, "프로필들임", HttpStatus.OK);
+        return events.stream()
+                .map(event -> {
+                    return UserEventsDto.fromEvent(event);
+                })
+                .collect(Collectors.toList());
     }
 
     public ResponseEntity<?> sendEmail(String email) {
-        Optional<Users> usersOptional = usersRepository.findByEmail(email);
-        if(usersOptional.isEmpty()) {
-            return responseDto.fail("존재하지 않는 이메일", HttpStatus.BAD_REQUEST);
-        }
-
-        Users users = usersOptional.get();
+        Users users = usersRepository.findByEmail(email).orElseThrow(NotFoundException::new);
 
         confirmPasswordCodeService.sendEmailConfirmCode(users.getId(), users.getEmail());
 

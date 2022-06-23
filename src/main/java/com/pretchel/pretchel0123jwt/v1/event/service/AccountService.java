@@ -1,9 +1,10 @@
-package com.pretchel.pretchel0123jwt.v1.account.service;
+package com.pretchel.pretchel0123jwt.v1.event.service;
 
 import com.pretchel.pretchel0123jwt.v1.account.domain.Users;
 import com.pretchel.pretchel0123jwt.v1.account.dto.account.AccountMapping;
 import com.pretchel.pretchel0123jwt.global.Response;
-import com.pretchel.pretchel0123jwt.v1.account.repository.AccountRepository;
+import com.pretchel.pretchel0123jwt.v1.account.service.UsersService;
+import com.pretchel.pretchel0123jwt.v1.event.repository.AccountRepository;
 import com.pretchel.pretchel0123jwt.v1.account.repository.UsersRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

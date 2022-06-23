@@ -1,5 +1,6 @@
 package com.pretchel.pretchel0123jwt.v1.account.domain;
 
+import com.pretchel.pretchel0123jwt.v1.event.domain.Account;
 import com.pretchel.pretchel0123jwt.v1.event.domain.Address;
 import com.pretchel.pretchel0123jwt.global.BaseTime;
 import lombok.*;
@@ -57,11 +58,11 @@ public class Users extends BaseTime implements UserDetails, OAuth2User {
     @Column
     private String providerId;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="default_address")
     private Address defaultAddress;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="default_account")
     private Account defaultAccount;
 

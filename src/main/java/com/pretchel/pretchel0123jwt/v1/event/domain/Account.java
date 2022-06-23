@@ -1,5 +1,6 @@
-package com.pretchel.pretchel0123jwt.v1.account.domain;
+package com.pretchel.pretchel0123jwt.v1.event.domain;
 
+import com.pretchel.pretchel0123jwt.v1.account.domain.Users;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

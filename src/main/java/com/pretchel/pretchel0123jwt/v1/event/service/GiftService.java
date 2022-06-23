@@ -1,13 +1,13 @@
 package com.pretchel.pretchel0123jwt.v1.event.service;
 
-import com.pretchel.pretchel0123jwt.v1.account.domain.Account;
+import com.pretchel.pretchel0123jwt.v1.event.domain.Account;
 import com.pretchel.pretchel0123jwt.v1.event.domain.Address;
 import com.pretchel.pretchel0123jwt.v1.event.domain.Event;
 import com.pretchel.pretchel0123jwt.v1.event.domain.Gift;
 import com.pretchel.pretchel0123jwt.v1.event.domain.GiftState;
 import com.pretchel.pretchel0123jwt.v1.event.dto.gift.GiftRequestDto;
 import com.pretchel.pretchel0123jwt.global.Response;
-import com.pretchel.pretchel0123jwt.v1.account.repository.AccountRepository;
+import com.pretchel.pretchel0123jwt.v1.event.repository.AccountRepository;
 import com.pretchel.pretchel0123jwt.v1.event.repository.AddressRepository;
 import com.pretchel.pretchel0123jwt.v1.event.repository.EventRepository;
 import com.pretchel.pretchel0123jwt.v1.event.repository.GiftRepository;

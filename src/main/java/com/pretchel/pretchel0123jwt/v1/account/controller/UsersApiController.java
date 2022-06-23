@@ -8,7 +8,7 @@ import com.pretchel.pretchel0123jwt.v1.account.dto.account.AccountRequestDto;
 import com.pretchel.pretchel0123jwt.v1.event.dto.address.AddressRequestDto;
 import com.pretchel.pretchel0123jwt.global.Response;
 import com.pretchel.pretchel0123jwt.v1.account.dto.user.UserRequestDto;
-import com.pretchel.pretchel0123jwt.v1.account.service.AccountService;
+import com.pretchel.pretchel0123jwt.v1.event.service.AccountService;
 import com.pretchel.pretchel0123jwt.v1.event.service.AddressService;
 import com.pretchel.pretchel0123jwt.v1.account.service.UsersService;
 import lombok.RequiredArgsConstructor;
@@ -74,14 +74,7 @@ public class UsersApiController {
         return usersService.logout(accesstoken, refreshtoken);
     }
 
-    @GetMapping("/user-info")
-    public ResponseEntity<?> userInfo(@AuthenticationPrincipal UserDetails userDetails) {
-        Users users = usersService.getUsersByEmail(userDetails);
-        if(users == null) {
-            return responseDto.fail("존재하지 않는 유저", HttpStatus.BAD_REQUEST);
-        }
-        return usersService.getUserProfile(userDetails);
-    }
+
 
     @GetMapping("/test")
     public ResponseEntity<?> test(@AuthenticationPrincipal UserDetails userDetails) {

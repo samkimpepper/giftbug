@@ -15,5 +15,7 @@ public interface EventRepository extends JpaRepository<Event, String> {
     @Query("select p from Event p where p.users = ?1")
     List<EventMapping> findProfilesByUserId(Users users);
 
+    List<Event> findAllByUsers(Users users);
+
     Page<Event> findAll(Pageable pageable);
 }

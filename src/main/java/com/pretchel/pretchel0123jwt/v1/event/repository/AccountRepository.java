@@ -1,6 +1,6 @@
-package com.pretchel.pretchel0123jwt.v1.account.repository;
+package com.pretchel.pretchel0123jwt.v1.event.repository;
 
-import com.pretchel.pretchel0123jwt.v1.account.domain.Account;
+import com.pretchel.pretchel0123jwt.v1.event.domain.Account;
 import com.pretchel.pretchel0123jwt.v1.account.domain.Users;
 import com.pretchel.pretchel0123jwt.v1.account.dto.account.AccountMapping;
 import org.springframework.data.jpa.repository.JpaRepository;

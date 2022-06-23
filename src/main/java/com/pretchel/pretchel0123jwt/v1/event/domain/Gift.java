@@ -1,7 +1,6 @@
 package com.pretchel.pretchel0123jwt.v1.event.domain;
 
 import com.pretchel.pretchel0123jwt.global.BaseTime;
-import com.pretchel.pretchel0123jwt.v1.account.domain.Account;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 

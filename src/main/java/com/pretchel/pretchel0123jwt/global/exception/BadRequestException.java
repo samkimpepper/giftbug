@@ -1,4 +1,4 @@
-package com.pretchel.pretchel0123jwt.exception;
+package com.pretchel.pretchel0123jwt.global.exception;
 
 import org.hibernate.cfg.Environment;
 import org.springframework.http.HttpStatus;
