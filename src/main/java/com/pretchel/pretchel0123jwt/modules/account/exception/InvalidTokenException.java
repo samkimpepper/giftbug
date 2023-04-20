@@ -4,7 +4,7 @@ import lombok.Getter;
 
 @Getter
 public class InvalidTokenException extends RuntimeException {
-    private String code;
+    private final String code;
 
     public InvalidTokenException() {
         super();

@@ -2,7 +2,7 @@ package com.pretchel.pretchel0123jwt.modules.account.domain;
 
 import com.pretchel.pretchel0123jwt.modules.info.domain.Account;
 import com.pretchel.pretchel0123jwt.modules.info.domain.Address;
-import com.pretchel.pretchel0123jwt.infra.global.BaseTime;
+import com.pretchel.pretchel0123jwt.modules.model.BaseTime;
 import com.pretchel.pretchel0123jwt.modules.oauth2.domain.OAuth2Provider;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
@@ -31,7 +31,7 @@ public class Users extends BaseTime implements UserDetails, OAuth2User {
     @Column(length = 36)
     private String id;
 
-    @Column(nullable = false)
+    @Column(unique = true, nullable = false)
     private String email;
 
     @Column

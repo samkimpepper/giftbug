@@ -8,11 +8,15 @@ spring:
   jpa:
     open-in-view: true
     hibernate:
-      ddl-auto: create
+      ddl-auto: none
     show-sql: true
     properties:
       hibernate.format_sql: true
     generate-ddl: true
+    # defer-datasource-initialization: true
+#  sql:
+#    init:
+#      mode: always
   thymeleaf:
     cache: false
   mvc:
@@ -96,7 +100,14 @@ openbanking:
   state: b80BLsfigm9OokPTjy03elbJqRHOfGSY
   auth-type: 0
   code-request-url: https://testapi.openbanking.or.kr/oauth/2.0/authorize
-  token-request-url: https://openapi.openbanking.or.kr/oauth/2.0/token
+  token-request-url: https://testapi.openbanking.or.kr/oauth/2.0/token
+  deposit:
+    cntr-account-num: 1002211600002
+    bank-tran-id: M202200255U
+    bank-code-std: '020'
+    account-holder-name: '이채림'
+
+
 
 cloud:
   aws:
@@ -110,7 +121,7 @@ cloud:
     stack:
       auto: false
 
-import:
+iamport:
   key: '0713949642152998'
   secret: 4e6d503ac4e0c8ac8095420d7dcb5ebd82f3c2e106551f600fca3f1ca7d4aab9b31da2cf364d6603
 

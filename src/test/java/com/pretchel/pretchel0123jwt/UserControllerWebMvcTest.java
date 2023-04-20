@@ -1,9 +1,9 @@
 package com.pretchel.pretchel0123jwt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.pretchel.pretchel0123jwt.modules.account.controller.UsersApiController;
+import com.pretchel.pretchel0123jwt.modules.account.controller.UserController;
 import com.pretchel.pretchel0123jwt.modules.account.dto.user.request.UserSignupDto;
-import com.pretchel.pretchel0123jwt.modules.account.service.UsersService;
+import com.pretchel.pretchel0123jwt.modules.account.service.UserService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -15,13 +15,13 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(UsersApiController.class)
+@WebMvcTest(UserController.class)
 public class UserControllerWebMvcTest {
     @Autowired
     private MockMvc mvc;
 
     @MockBean
-    private UsersService usersService;
+    private UserService userService;
 
     @Autowired
     ObjectMapper mapper;

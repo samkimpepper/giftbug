@@ -1,7 +1,7 @@
 package com.pretchel.pretchel0123jwt.modules.event.dto.event;
 
 import com.pretchel.pretchel0123jwt.modules.event.domain.Event;
-import com.pretchel.pretchel0123jwt.modules.event.dto.gift.GiftListDto;
+import com.pretchel.pretchel0123jwt.modules.gift.dto.GiftListDto;
 import lombok.Builder;
 import lombok.Getter;
 

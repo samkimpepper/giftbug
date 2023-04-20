@@ -1,8 +1,8 @@
 package com.pretchel.pretchel0123jwt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.pretchel.pretchel0123jwt.modules.account.repository.UsersRepository;
-import com.pretchel.pretchel0123jwt.modules.account.service.UsersService;
+import com.pretchel.pretchel0123jwt.modules.account.repository.UserRepository;
+import com.pretchel.pretchel0123jwt.modules.account.service.UserService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -14,10 +14,10 @@ import org.springframework.transaction.annotation.Transactional;
 @AutoConfigureMockMvc
 class Pretchel0123JwtApplicationTests {
     @Autowired
-    private UsersService usersService;
+    private UserService userService;
 
     @Autowired
-    private UsersRepository usersRepository;
+    private UserRepository userRepository;
 
     @Autowired
     private MockMvc mvc;

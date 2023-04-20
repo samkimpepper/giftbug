@@ -5,7 +5,7 @@ import com.pretchel.pretchel0123jwt.modules.oauth2.domain.OAuth2UserInfoFactory;
 import com.pretchel.pretchel0123jwt.modules.oauth2.domain.OAuth2Provider;
 import com.pretchel.pretchel0123jwt.modules.account.domain.UserPrincipal;
 import com.pretchel.pretchel0123jwt.modules.account.domain.Users;
-import com.pretchel.pretchel0123jwt.modules.account.repository.UsersRepository;
+import com.pretchel.pretchel0123jwt.modules.account.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.core.AuthenticationException;
@@ -21,7 +21,7 @@ import java.util.Optional;
 @Service
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     @Autowired
-    private UsersRepository usersRepository;
+    private UserRepository userRepository;
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
@@ -42,7 +42,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
         }
 
-        Optional<Users> usersOptional = usersRepository.findByEmail(oauth2UserInfo.getEmail());
+        Optional<Users> usersOptional = userRepository.findByEmail(oauth2UserInfo.getEmail());
         Users users;
         if(usersOptional.isPresent()) {
             users = usersOptional.get();
@@ -64,7 +64,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         users.setProviderId(userInfo.getId());
         users.setEmail(userInfo.getEmail());
 
-        return usersRepository.save(users);
+        return userRepository.save(users);
     }
 
 

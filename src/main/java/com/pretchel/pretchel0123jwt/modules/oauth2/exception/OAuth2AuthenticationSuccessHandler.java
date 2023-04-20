@@ -1,8 +1,8 @@
 package com.pretchel.pretchel0123jwt.modules.oauth2.exception;
 
-import com.pretchel.pretchel0123jwt.infra.config.jwt.JwtTokenProvider;
+import com.pretchel.pretchel0123jwt.infra.jwt.JwtTokenProvider;
 import com.pretchel.pretchel0123jwt.modules.oauth2.service.HttpCookieOAuth2AuthorizationRequestRepository;
-import com.pretchel.pretchel0123jwt.infra.util.CookieUtils;
+import com.pretchel.pretchel0123jwt.global.util.CookieUtils;
 import com.pretchel.pretchel0123jwt.modules.account.dto.user.UserResponseDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;

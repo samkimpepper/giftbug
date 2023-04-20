@@ -1,16 +1,19 @@
 package com.pretchel.pretchel0123jwt.modules.event.service;
 
-import com.pretchel.pretchel0123jwt.infra.config.jwt.JwtTokenProvider;
-import com.pretchel.pretchel0123jwt.infra.global.exception.NotFoundException;
-import com.pretchel.pretchel0123jwt.infra.global.exception.S3UploadException;
-import com.pretchel.pretchel0123jwt.modules.event.domain.Event;
+import com.pretchel.pretchel0123jwt.global.Response;
+import com.pretchel.pretchel0123jwt.global.exception.NotFoundException;
+import com.pretchel.pretchel0123jwt.global.exception.S3UploadException;
+import com.pretchel.pretchel0123jwt.global.util.S3Uploader;
 import com.pretchel.pretchel0123jwt.modules.account.domain.Users;
-import com.pretchel.pretchel0123jwt.infra.util.S3Uploader;
-import com.pretchel.pretchel0123jwt.modules.account.service.UsersService;
-import com.pretchel.pretchel0123jwt.modules.event.dto.event.*;
-import com.pretchel.pretchel0123jwt.infra.global.Response;
-import com.pretchel.pretchel0123jwt.modules.event.dto.gift.GiftListDto;
+import com.pretchel.pretchel0123jwt.modules.event.domain.Event;
+import com.pretchel.pretchel0123jwt.modules.event.dto.event.EventCreateDto;
+import com.pretchel.pretchel0123jwt.modules.event.dto.event.EventDetailDto;
+import com.pretchel.pretchel0123jwt.modules.event.dto.event.EventListDto;
+import com.pretchel.pretchel0123jwt.modules.event.dto.event.ProfileResponseDto;
 import com.pretchel.pretchel0123jwt.modules.event.repository.EventRepository;
+import com.pretchel.pretchel0123jwt.modules.gift.GiftService;
+import com.pretchel.pretchel0123jwt.modules.gift.dto.GiftListDto;
+import com.pretchel.pretchel0123jwt.modules.gift.repository.GiftRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -25,25 +28,25 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class EventService {
-    private final EventRepository profileRepository;
+    private final EventRepository eventRepository;
+    private final GiftRepository giftRepository;
     private final GiftService giftService;
     private final Response responseDto;
-    private final JwtTokenProvider jwtTokenProvider;
-    private final UsersService usersService;
     private final S3Uploader s3Uploader;
     private final ModelMapper modelMapper;
 
 
     @Transactional
-    public void save(EventCreateDto dto, String email) {
-        Users users = usersService.findUserByEmail(email);
+    public void save(EventCreateDto dto, Users user) {
 
         Date date = null;
         try {
@@ -72,31 +75,27 @@ public class EventService {
                         .profileImageUrl(profileImageUrl)
                         .backgroundImageUrl(backgroundImageUrl)
                         .deadLine(date)
-                        .users(users)
+                        .users(user)
                         .isExpired(false)
                         .build();
-                profileRepository.save(profile);
+                eventRepository.save(profile);
             }
-            return;
 
         } catch (IOException ex) {
             throw new S3UploadException();
         }
     }
 
-    public List<EventListDto> getMyEvents(String email) {
-        Users users = usersService.findUserByEmail(email);
+    public List<EventListDto> getMyEvents(Users user) {
 
-//        List<EventMapping> profiles = profileRepository.findProfilesByUserId(users);
+//        List<EventMapping> profiles = eventRepository.findProfilesByUserId(users);
 //        List<EventMapping> sortedProfiles = profiles.stream()
 //                .sorted(Comparator.comparing(EventMapping::getCreateDate).reversed())
 //                .collect(Collectors.toList());
 
-        List<Event> eventList = profileRepository.findAllByUsers(users);
+        List<Event> eventList = eventRepository.findAllByUsers(user);
         List<EventListDto> dtoList = eventList.stream()
-                .map(event -> {
-                    return EventListDto.fromEvent(event);
-                })
+                .map(EventListDto::fromEvent)
                 .collect(Collectors.toList());
 
         return dtoList.stream()
@@ -105,14 +104,14 @@ public class EventService {
     }
 
     public ResponseEntity<?> getAllProfiles() {
-        List<Event> profiles = profileRepository.findAll();
+        List<Event> profiles = eventRepository.findAll();
 
         return responseDto.success(profiles, "모든 프로필", HttpStatus.OK);
     }
 
     @Transactional(readOnly = true)
     public ResponseEntity<?> findAllByOrderByCreateDate(int pageNum, int profilesPerPage) {
-        Page<Event> pages = profileRepository.findAll(
+        Page<Event> pages = eventRepository.findAll(
                 PageRequest.of(pageNum - 1, profilesPerPage, Sort.by(Sort.Direction.DESC, "createDate"))
         );
 
@@ -130,29 +129,26 @@ public class EventService {
 
     @Transactional(readOnly = true)
     public EventDetailDto getDetail(String eventId) {
-        Event event = profileRepository.findById(eventId).orElseThrow(NotFoundException::new);
+        Event event = eventRepository.findById(eventId).orElseThrow(NotFoundException::new);
         List<GiftListDto> giftList = giftService.getMyGifts(event);
         return EventDetailDto.fromEvent(event, giftList);
     }
 
 
     public Event findById(String eventId) {
-        return profileRepository.findById(eventId).orElseThrow(NotFoundException::new);
+        return eventRepository.findById(eventId).orElseThrow(NotFoundException::new);
     }
 
     public Long count() {
-        return profileRepository.count();
+        return eventRepository.count();
     }
 
     @Transactional
     public ResponseEntity<?> delete(String eventId) {
-        Optional<Event> eventOptional = profileRepository.findById(eventId);
-        if(eventOptional.isEmpty()) {
-            return responseDto.fail("없는 이벤트임", HttpStatus.NOT_FOUND);
-        }
-        Event event = eventOptional.get();
+        Event event = eventRepository.findById(eventId).orElseThrow(NotFoundException::new);
 
-        profileRepository.delete(event);
+        giftRepository.deleteAllByEvent(event);
+        eventRepository.delete(event);
 
         return responseDto.success("삭제 완료");
     }

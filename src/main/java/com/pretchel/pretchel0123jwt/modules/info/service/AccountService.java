@@ -1,14 +1,14 @@
 package com.pretchel.pretchel0123jwt.modules.info.service;
 
-import com.pretchel.pretchel0123jwt.infra.global.exception.NotFoundException;
+import com.pretchel.pretchel0123jwt.global.exception.NotFoundException;
 import com.pretchel.pretchel0123jwt.modules.account.domain.Users;
 import com.pretchel.pretchel0123jwt.modules.info.dto.account.AccountCreateDto;
 import com.pretchel.pretchel0123jwt.modules.info.dto.account.AccountListDto;
-import com.pretchel.pretchel0123jwt.infra.global.Response;
-import com.pretchel.pretchel0123jwt.modules.account.service.UsersService;
+import com.pretchel.pretchel0123jwt.global.Response;
+import com.pretchel.pretchel0123jwt.modules.account.service.UserService;
 import com.pretchel.pretchel0123jwt.modules.info.domain.Account;
 import com.pretchel.pretchel0123jwt.modules.info.repository.AccountRepository;
-import com.pretchel.pretchel0123jwt.modules.account.repository.UsersRepository;
+import com.pretchel.pretchel0123jwt.modules.account.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -23,9 +23,9 @@ import java.util.stream.Collectors;
 @Service
 public class AccountService {
     private final AccountRepository accountRepository;
-    private final UsersRepository usersRepository;
+    private final UserRepository userRepository;
     private final Response responseDto;
-    private final UsersService usersService;
+    private final UserService userService;
 
     public Account findById(String accountId) {
         return accountRepository.findById(accountId).orElseThrow(NotFoundException::new);
@@ -33,7 +33,7 @@ public class AccountService {
 
     @Transactional
     public void createAccount(AccountCreateDto dto, String email) {
-        Users users = usersRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("잘못된 유저 이메일"));
+        Users users = userRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("잘못된 유저 이메일"));
 
         Account account = Account.builder()
                 .name(dto.getName())
@@ -53,7 +53,7 @@ public class AccountService {
 
     @Transactional
     public List<AccountListDto> getAllMyAccounts(String email) {
-        Users users = usersRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("잘못된 유저 이메일"));
+        Users users = userRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("잘못된 유저 이메일"));
 
         //List<AccountMapping> accounts = accountRepository.findAllByUserId(users);
         List<Account> accountList = accountRepository.findAllByUsers(users);

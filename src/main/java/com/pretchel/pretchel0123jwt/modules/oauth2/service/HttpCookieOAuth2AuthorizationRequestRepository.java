@@ -1,6 +1,6 @@
 package com.pretchel.pretchel0123jwt.modules.oauth2.service;
 
-import com.pretchel.pretchel0123jwt.infra.util.CookieUtils;
+import com.pretchel.pretchel0123jwt.global.util.CookieUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.oauth2.client.web.AuthorizationRequestRepository;
 import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;

@@ -1,6 +1,9 @@
 package com.pretchel.pretchel0123jwt.modules.account.service;
 
+import com.pretchel.pretchel0123jwt.global.exception.InvalidInputException;
+import com.pretchel.pretchel0123jwt.infra.EmailSender;
 import com.pretchel.pretchel0123jwt.modules.account.domain.ConfirmPasswordCode;
+import com.pretchel.pretchel0123jwt.modules.account.domain.Users;
 import com.pretchel.pretchel0123jwt.modules.account.repository.ConfirmPasswordCodeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.mail.SimpleMailMessage;
@@ -13,10 +16,20 @@ import java.util.Optional;
 @Service
 public class ConfirmPasswordCodeService {
     private final ConfirmPasswordCodeRepository confirmPasswordCodeRepository;
-    private final EmailSenderService emailSenderService;
+    private final EmailSender emailSender;
+
+    public void sendEmail(Users user) {
+        sendEmailConfirmCode(user.getId(), user.getEmail());
+    }
+
+    public void confirmEmail(String authCode) {
+
+        ConfirmPasswordCode recvCode = findByIdAndExpiryDateAfterAndExpired(authCode).orElseThrow(InvalidInputException::new);
+        recvCode.setExpired();
+    }
 
     // 이메일 인증 코드 생성
-    public String sendEmailConfirmCode(String userId, String receiverEmail) {
+    private String sendEmailConfirmCode(String userId, String receiverEmail) {
         ConfirmPasswordCode emailCode = ConfirmPasswordCode.create(userId);
         confirmPasswordCodeRepository.save(emailCode);
 
@@ -24,13 +37,14 @@ public class ConfirmPasswordCodeService {
         mailMessage.setTo(receiverEmail);
         mailMessage.setSubject("비밀번호 변경 인증 코드");
         mailMessage.setText(emailCode.getId());
-        emailSenderService.sendEmail(mailMessage);
+        emailSender.sendEmail(mailMessage);
 
         return emailCode.getId();
     }
 
-    public Optional<ConfirmPasswordCode> findByIdAndExpiryDateAfterAndExpired(String codeId) {
-        Optional<ConfirmPasswordCode> confirmPasswordCode = confirmPasswordCodeRepository.findByIdAndExpiryDateAfterAndExpired(codeId, LocalDateTime.now(), false);
-        return confirmPasswordCode;
+    private Optional<ConfirmPasswordCode> findByIdAndExpiryDateAfterAndExpired(String codeId) {
+        return confirmPasswordCodeRepository.findByIdAndExpiryDateAfterAndExpired(codeId, LocalDateTime.now(), false);
     }
+
+
 }

@@ -1,6 +1,6 @@
 package com.pretchel.pretchel0123jwt.modules.event.domain;
 
-import com.pretchel.pretchel0123jwt.infra.global.BaseTime;
+import com.pretchel.pretchel0123jwt.modules.model.BaseTime;
 import com.pretchel.pretchel0123jwt.modules.account.domain.Users;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

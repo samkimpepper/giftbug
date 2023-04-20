@@ -4,7 +4,7 @@ import lombok.Getter;
 
 @Getter
 public class ExpiredTokenException extends RuntimeException {
-    private String code;
+    private final String code;
 
     public ExpiredTokenException() {
         super();

@@ -40,4 +40,8 @@ public class Account {
     @Column(nullable = false)
     private String birthday;
 
+    @Column
+    private Boolean isDefault;
+
+
 }

@@ -1,6 +1,6 @@
 package com.pretchel.pretchel0123jwt.modules.info.controller;
 
-import com.pretchel.pretchel0123jwt.infra.global.ResponseDto;
+import com.pretchel.pretchel0123jwt.global.ResponseDto;
 import com.pretchel.pretchel0123jwt.modules.info.dto.account.AccountCreateDto;
 import com.pretchel.pretchel0123jwt.modules.info.dto.account.AccountListDto;
 import com.pretchel.pretchel0123jwt.modules.info.dto.address.AddressCreateDto;

@@ -4,7 +4,7 @@ import lombok.Getter;
 
 @Getter
 public class UserAlreadyExistsException extends RuntimeException {
-    private String code;
+    private final String code;
 
     public UserAlreadyExistsException() {
         super();

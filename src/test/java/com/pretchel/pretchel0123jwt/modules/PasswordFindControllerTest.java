@@ -2,12 +2,12 @@ package com.pretchel.pretchel0123jwt.modules;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pretchel.pretchel0123jwt.config.WithMockCustomUser;
-import com.pretchel.pretchel0123jwt.infra.global.exception.NotFoundException;
+import com.pretchel.pretchel0123jwt.global.exception.NotFoundException;
 import com.pretchel.pretchel0123jwt.modules.account.domain.Users;
 import com.pretchel.pretchel0123jwt.modules.account.dto.user.request.UserSignupDto;
 import com.pretchel.pretchel0123jwt.modules.account.exception.UserAlreadyExistsException;
-import com.pretchel.pretchel0123jwt.modules.account.repository.UsersRepository;
-import com.pretchel.pretchel0123jwt.modules.account.service.UsersService;
+import com.pretchel.pretchel0123jwt.modules.account.repository.UserRepository;
+import com.pretchel.pretchel0123jwt.modules.account.service.UserService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -37,10 +37,10 @@ public class PasswordFindControllerTest {
     private MockMvc mvc;
 
     @Autowired
-    private UsersService usersService;
+    private UserService userService;
 
     @Autowired
-    private UsersRepository usersRepository;
+    private UserRepository userRepository;
 
     @BeforeEach
     void setup() throws Exception {
@@ -70,7 +70,7 @@ public class PasswordFindControllerTest {
 
     @AfterEach
     void clean() {
-        usersRepository.deleteAll();
+        userRepository.deleteAll();
     }
 
     @Test
@@ -93,7 +93,7 @@ public class PasswordFindControllerTest {
 
     @Test
     void findEmail() throws Exception {
-        Users user = usersRepository.findByEmail("duck12@gmail.com").orElseThrow(NotFoundException::new);
+        Users user = userRepository.findByEmail("duck12@gmail.com").orElseThrow(NotFoundException::new);
         System.out.println(user.getEmail());
 
         Map<String, String> content = new HashMap<>();

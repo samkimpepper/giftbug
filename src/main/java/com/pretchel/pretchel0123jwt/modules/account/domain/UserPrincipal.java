@@ -9,10 +9,10 @@ import java.util.*;
 
 @Getter
 public class UserPrincipal implements OAuth2User, UserDetails {
-    private String id;
-    private String email;
-    private String password;
-    private List<String> roles = new ArrayList<>();
+    private final String id;
+    private final String email;
+    private final String password;
+    private List<String> roles;
     private Map<String, Object> attributes;
 
     public UserPrincipal(String id, String email, String password, List<String> roles) {
