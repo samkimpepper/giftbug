@@ -43,4 +43,8 @@ public class Address {
     @JoinColumn(name="user_id")
     private Users users;
 
+    public void setIsDefault(boolean isDefault) {
+        this.isDefault = isDefault;
+    }
+
 }

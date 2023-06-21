@@ -1,8 +1,10 @@
 package com.pretchel.pretchel0123jwt.modules.payments.iamport.dto;
 
+import lombok.Builder;
 import lombok.Getter;
 
 @Getter
+@Builder
 public class PaymentsCompleteDto {
     private String impUid;
     private String merchantUid;

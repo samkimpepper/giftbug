@@ -56,9 +56,8 @@ public class IamportPayment extends BaseTime {
     // 비회원 결제도 가능해서 nullable=false일 필요 없음
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
-    private Users user;
+    private Users buyer;
 
-    // TODO: 이건 nullable=false여야할 듯.
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "gift_id")
     private Gift gift;
@@ -73,12 +72,13 @@ public class IamportPayment extends BaseTime {
                 .merchant_uid(dto.getMerchantUid())
                 .imp_uid(dto.getImpUid())
                 .amount(dto.getAmount())
+                .status(PaymentsStatus.PAID)
                 .buyerName(dto.getBuyerName())
                 .buyerEmail(dto.getBuyerEmail())
                 .message(dto.getMessage())
                 .isMember(dto.getIsMember())
                 .gift(gift)
-                .user(user)
+                .buyer(user)
                 .build();
 
     }

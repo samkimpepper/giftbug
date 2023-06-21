@@ -4,10 +4,11 @@ import com.pretchel.pretchel0123jwt.global.exception.InvalidInputException;
 import com.pretchel.pretchel0123jwt.global.exception.NotFoundException;
 import com.pretchel.pretchel0123jwt.modules.account.domain.Users;
 import com.pretchel.pretchel0123jwt.modules.account.dto.user.response.UserInfoDto;
-import com.pretchel.pretchel0123jwt.modules.account.dto.user.request.ModifyInfoDto;
-import com.pretchel.pretchel0123jwt.modules.account.dto.user.request.ModifyPasswordDto;
+import com.pretchel.pretchel0123jwt.modules.account.dto.user.request.UpdateUserInfoDto;
+import com.pretchel.pretchel0123jwt.modules.account.dto.user.request.UpdatePasswordDto;
 import com.pretchel.pretchel0123jwt.modules.account.exception.PasswordNotMatchException;
 import com.pretchel.pretchel0123jwt.modules.account.repository.UserRepository;
+import com.pretchel.pretchel0123jwt.modules.info.domain.Account;
 import com.pretchel.pretchel0123jwt.modules.info.dto.account.AccountInfoDto;
 import com.pretchel.pretchel0123jwt.modules.notification.event.PasswordChangedEvent;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +30,7 @@ public class UserSettingService {
     private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
-    public void update(ModifyInfoDto dto, String email) {
+    public void update(UpdateUserInfoDto dto, String email) {
         Date date = null;
         if(dto.getBirthday() != null) {
             try {
@@ -46,11 +47,12 @@ public class UserSettingService {
     }
 
     @Transactional
-    public void updatePassword(ModifyPasswordDto dto, String email) {
+    public void updatePassword(UpdatePasswordDto dto, String email) {
         Users user = userRepository.findByEmail(email).orElseThrow(NotFoundException::new);
 
         if(passwordEncoder.matches(dto.getPassword(), user.getPassword())) {
             if(!dto.getNewPassword().equals(dto.getCheckPassword())) {
+
                 throw new PasswordNotMatchException();
             }
             user.updatePassword(passwordEncoder.encode(dto.getNewPassword()));
@@ -63,15 +65,20 @@ public class UserSettingService {
         throw new PasswordNotMatchException();
     }
 
-    public UserInfoDto getUserInfo(String email) {
-        Users users = userRepository.findByEmail(email).orElseThrow(NotFoundException::new);
+    public UserInfoDto getUserInfo(Users user, Account account) {
 
-        AccountInfoDto account = null;
-        if(users.getDefaultAccount() != null) {
-            account = AccountInfoDto.fromAccount(users.getDefaultAccount());
+        AccountInfoDto accountInfoDto = null;
+        if(account != null) {
+            accountInfoDto = AccountInfoDto.fromAccount(account);
         }
 
-        return UserInfoDto.fromUser(users, account);
+        return UserInfoDto.fromUser(user, accountInfoDto);
 
+    }
+
+
+    @Transactional
+    public Account getDefaultAccount(Users user) {
+        return user.getDefaultAccount();
     }
 }

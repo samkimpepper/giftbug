@@ -8,6 +8,7 @@ import com.pretchel.pretchel0123jwt.modules.account.repository.ConfirmPasswordCo
 import lombok.RequiredArgsConstructor;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -22,6 +23,7 @@ public class ConfirmPasswordCodeService {
         sendEmailConfirmCode(user.getId(), user.getEmail());
     }
 
+    @Transactional
     public void confirmEmail(String authCode) {
 
         ConfirmPasswordCode recvCode = findByIdAndExpiryDateAfterAndExpired(authCode).orElseThrow(InvalidInputException::new);

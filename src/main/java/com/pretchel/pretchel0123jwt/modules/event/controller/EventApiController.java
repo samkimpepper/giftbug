@@ -6,10 +6,13 @@ import com.pretchel.pretchel0123jwt.global.util.Paginator;
 import com.pretchel.pretchel0123jwt.modules.account.domain.Users;
 import com.pretchel.pretchel0123jwt.modules.account.repository.UserRepository;
 import com.pretchel.pretchel0123jwt.modules.account.service.UserService;
+import com.pretchel.pretchel0123jwt.modules.event.domain.Event;
 import com.pretchel.pretchel0123jwt.modules.event.dto.event.EventCreateDto;
 import com.pretchel.pretchel0123jwt.modules.event.dto.event.EventDetailDto;
 import com.pretchel.pretchel0123jwt.modules.event.dto.event.EventListDto;
+import com.pretchel.pretchel0123jwt.modules.event.repository.EventRepository;
 import com.pretchel.pretchel0123jwt.modules.event.service.EventService;
+import com.pretchel.pretchel0123jwt.modules.gift.GiftService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +28,10 @@ import java.util.Map;
 public class EventApiController {
 
     private final EventService eventService;
+
+    private final GiftService giftService;
+
+    private final EventRepository eventRepository;
     private final UserRepository userRepository;
     private static final Integer PROFILES_PER_PAGE = 12;
     private static final Integer PAGES_PER_BLOCK = 5;
@@ -70,6 +77,8 @@ public class EventApiController {
     @DeleteMapping("/{id}")
     public ResponseDto.Empty delete(@PathVariable("id") String id) {
 
+        Event event = eventRepository.findById(id).orElseThrow(NotFoundException::new);
+        giftService.deleteAllByEvent(event);
         eventService.delete(id);
         return new ResponseDto.Empty();
     }

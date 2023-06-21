@@ -1,7 +1,9 @@
 package com.pretchel.pretchel0123jwt.modules.account;
 
 import com.pretchel.pretchel0123jwt.modules.account.domain.Users;
+import com.pretchel.pretchel0123jwt.modules.account.dto.user.request.UserSignupDto;
 import com.pretchel.pretchel0123jwt.modules.account.repository.UserRepository;
+import com.pretchel.pretchel0123jwt.modules.account.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -13,21 +15,19 @@ import java.util.Date;
 public class UserFactory {
 
     @Autowired
-    UserRepository userRepository;
+    UserService userService;
 
-    public Users createUser(String email) throws ParseException {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        Date date = new Date(sdf.parse("2022-08-21").getTime());
+    public void createUser(String email) throws ParseException {
 
-        Users user = Users.builder()
-                .email(email)
-                .password("password")
-                .birthday(date)
-                .phoneNumber("01012345678")
-                .gender("FEMALE")
-                .build();
+        UserSignupDto dto = UserSignupDto.builder()
+                        .email(email)
+                        .password("password")
+                        .checkPassword("password")
+                        .birthday("1999-06-13")
+                        .phoneNumber("010-0000-0000")
+                        .gender("FEMALE")
+                        .build();
 
-        userRepository.save(user);
-        return user;
+        userService.signUp(dto);
     }
 }

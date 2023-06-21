@@ -18,4 +18,6 @@ public class ReqListDto {
     private String req_client_account_num;
     private String req_client_num;
     private String transfer_purpose;
+
+
 }

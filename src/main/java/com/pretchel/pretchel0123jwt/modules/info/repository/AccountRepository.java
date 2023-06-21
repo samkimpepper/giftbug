@@ -12,6 +12,9 @@ public interface AccountRepository extends JpaRepository<Account, String> {
 
     List<Account> findAllByUsers(Users users);
 
+
+    List<Account> findAllByUsersAndIsDefault(Users users, Boolean isDefault);
+
     @Query("select a from Account a where a.users = ?1")
     List<AccountMapping> findAllByUserId(Users users);
 }

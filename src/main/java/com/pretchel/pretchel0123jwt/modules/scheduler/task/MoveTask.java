@@ -1,5 +1,7 @@
 package com.pretchel.pretchel0123jwt.modules.scheduler.task;
 
+import com.pretchel.pretchel0123jwt.modules.deposit.OpenbankingDepositRepository;
+import com.pretchel.pretchel0123jwt.modules.deposit.domain.OpenbankingDeposit;
 import com.pretchel.pretchel0123jwt.modules.gift.domain.CompletedGift;
 import com.pretchel.pretchel0123jwt.modules.gift.domain.Gift;
 import com.pretchel.pretchel0123jwt.modules.gift.domain.GiftState;
@@ -28,6 +30,8 @@ public class MoveTask {
 
     private final IamportPaymentRepository iamportPaymentRepository;
 
+    private final OpenbankingDepositRepository depositRepository;
+
     /*
      *
      * state가 ongoing이 아니고, processState가 success인 애들 대상으로
@@ -51,6 +55,11 @@ public class MoveTask {
             List<IamportPayment> payments = iamportPaymentRepository.findAllByGift(gift);
             for(IamportPayment payment: payments) {
                 payment.moveToCompletedGift(completedGift);
+            }
+
+            List<OpenbankingDeposit> deposits = depositRepository.findAllByGift(gift);
+            for(OpenbankingDeposit deposit: deposits) {
+                deposit.moveToCompletedGift(completedGift);
             }
 
             giftRepository.delete(gift);

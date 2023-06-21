@@ -19,6 +19,7 @@ import java.util.List;
 public class OpenbankingDepositService {
     private final OpenbankingDepositRepository openbankingDepositRepository;
 
+    @Transactional
     public void save(OpenbankingStatus status, OpenbankingDepositResponseDto dto, Gift gift, Users receiver) {
 
         OpenbankingDeposit deposit = OpenbankingDeposit.of(dto, gift, receiver, status);
@@ -47,6 +48,6 @@ public class OpenbankingDepositService {
 
     // createdAt 컬럼의 DESC 순대로 정렬
     public List<OpenbankingDeposit> findAllByGiftDESC(Gift gift) {
-        return openbankingDepositRepository.findAllByGift(gift, Sort.by(Sort.Direction.DESC, "createdAt"));
+        return openbankingDepositRepository.findAllByGift(gift, Sort.by(Sort.Direction.DESC, "createDate"));
     }
 }

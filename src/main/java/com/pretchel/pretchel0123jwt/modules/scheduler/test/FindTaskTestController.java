@@ -18,10 +18,4 @@ public class FindTaskTestController {
         task.findExpiredGifts();
         return new ResponseDto.Empty();
     }
-
-    @GetMapping("/test/find/completed")
-    public ResponseDto.Empty testFindCompletedGifts() {
-        task.findCompletedGifts();
-        return new ResponseDto.Empty();
-    }
 }

@@ -70,11 +70,10 @@ class EventApiControllerTest {
     @Autowired
     private MockMvc mvc;
 
-    Users user;
 
     @BeforeEach
     void setup() throws ParseException {
-        user = userFactory.createUser("duck12@gmail.com");
+        userFactory.createUser("duck12@gmail.com");
     }
 
 
@@ -88,11 +87,10 @@ class EventApiControllerTest {
 
     @Test
     @WithMockCustomUser
-    @Transactional
     @DisplayName("디폴트 주소나 계좌 둘 중 하나라도 설정하지 않으면 이벤트 생성 불가")
     void createEventFail() throws Exception {
+        Users user = userRepository.findByEmail("duck12@gmail.com").orElseThrow();
         addressAccountFactory.createAccount("김오리", user, true);
-        user.setDefaultAddress(null);
 
         mvc.perform(
                 multipart("/api/event")
@@ -106,9 +104,9 @@ class EventApiControllerTest {
 
     @Test
     @WithMockCustomUser
-    @Transactional
     @DisplayName("디폹트 주소 설정해서 이벤트 생성 성공")
     void createEventSuccess() throws Exception {
+        Users user = userRepository.findByEmail("duck12@gmail.com").orElseThrow();
         addressAccountFactory.createAccount("김오리", user, true);
         addressAccountFactory.createAddress("김오리", user, true);
 
@@ -196,6 +194,7 @@ class EventApiControllerTest {
     @WithMockCustomUser
     @DisplayName("이벤트 삭제(선물이 없기 때문에 성공)")
     void deleteEventSuccess() throws Exception {
+        Users user = userRepository.findByEmail("duck12@gmail.com").orElseThrow();
         addressAccountFactory.createAccount("오리오리", user, true);
         addressAccountFactory.createAddress("오리오리", user, true);
         Event event = eventFactory.createEvent(user, "오리오리", "2022-11-25");

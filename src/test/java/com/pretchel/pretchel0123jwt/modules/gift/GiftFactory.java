@@ -9,12 +9,14 @@ import com.pretchel.pretchel0123jwt.modules.info.domain.Account;
 import com.pretchel.pretchel0123jwt.modules.info.domain.Address;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
 public class GiftFactory {
     @Autowired
     GiftRepository giftRepository;
 
+    @Transactional
     public Gift createGift(String name, int price, Event event, Account account, Address address) {
         Gift gift = Gift.builder()
                 .name(name)
@@ -32,6 +34,8 @@ public class GiftFactory {
         giftRepository.save(gift);
         return gift;
     }
+
+
 
     public GiftCreateDto createGiftDto(String name, int price, Event event, Account account, Address address){
         GiftCreateDto dto = GiftCreateDto.builder()

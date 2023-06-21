@@ -5,17 +5,16 @@ import com.pretchel.pretchel0123jwt.config.WithMockCustomUser;
 import com.pretchel.pretchel0123jwt.global.exception.InvalidInputException;
 import com.pretchel.pretchel0123jwt.modules.account.domain.Users;
 import com.pretchel.pretchel0123jwt.modules.account.dto.user.request.LoginDto;
-import com.pretchel.pretchel0123jwt.modules.account.dto.user.request.ModifyInfoDto;
+import com.pretchel.pretchel0123jwt.modules.account.dto.user.request.UpdateUserInfoDto;
 import com.pretchel.pretchel0123jwt.modules.account.dto.user.request.UserSignupDto;
 import com.pretchel.pretchel0123jwt.modules.account.repository.UserRepository;
-import com.pretchel.pretchel0123jwt.modules.account.service.UserService;
+import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
@@ -35,14 +34,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 class UsersApiControllerTest {
 
-    @Autowired
-    private UserService userService;
 
     @Autowired
     private UserRepository userRepository;
-
-    @Autowired
-    private PasswordEncoder encoder;
 
     @Autowired
     ObjectMapper mapper;
@@ -100,12 +94,19 @@ class UsersApiControllerTest {
                 .andExpect(authenticated().withUsername("duck12@gmail.com"));
     }
 
-    
+    @Test
+    @WithMockCustomUser
+    void getUserInfo() throws Exception {
+        mvc.perform(get("/api/user/user-info"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.email", CoreMatchers.is("duck12@gmail.com")));
+    }
 
     @Test
     @WithMockCustomUser
     void updateUserInfo() throws Exception {
-        ModifyInfoDto dto = ModifyInfoDto.builder()
+        UpdateUserInfoDto dto = UpdateUserInfoDto.builder()
                 .birthday(null)
                 .phoneNumber("01098765432")
                 .build();
@@ -122,7 +123,7 @@ class UsersApiControllerTest {
     @Test
     @WithMockCustomUser
     void updateInvalidBirthday() throws Exception {
-        ModifyInfoDto dto = ModifyInfoDto.builder()
+        UpdateUserInfoDto dto = UpdateUserInfoDto.builder()
                 .birthday("1999.01.01")
                 .phoneNumber("01098765432")
                 .build();
@@ -143,7 +144,7 @@ class UsersApiControllerTest {
     @Test
     @WithMockCustomUser
     void updateInvalidPhoneNumber() throws Exception {
-        ModifyInfoDto dto = ModifyInfoDto.builder()
+        UpdateUserInfoDto dto = UpdateUserInfoDto.builder()
                 .birthday("1999-01-01")
                 .phoneNumber(null)
                 .build();

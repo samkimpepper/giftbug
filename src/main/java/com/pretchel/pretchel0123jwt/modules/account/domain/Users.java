@@ -1,5 +1,6 @@
 package com.pretchel.pretchel0123jwt.modules.account.domain;
 
+import com.pretchel.pretchel0123jwt.global.exception.NotFoundException;
 import com.pretchel.pretchel0123jwt.modules.info.domain.Account;
 import com.pretchel.pretchel0123jwt.modules.info.domain.Address;
 import com.pretchel.pretchel0123jwt.modules.model.BaseTime;
@@ -52,20 +53,20 @@ public class Users extends BaseTime implements UserDetails, OAuth2User {
     @Column
     private String phoneNumber;
 
+    @OneToMany(cascade = CascadeType.REMOVE)
+    @JoinColumn(name="account_id")
+    private List<Account> accounts = new ArrayList<>();
+
+    @OneToMany(cascade = CascadeType.REMOVE)
+    @JoinColumn(name="address_id")
+    private List<Address> addresses = new ArrayList<>();
+
     @Column
     @Enumerated(EnumType.STRING)
     private OAuth2Provider provider;
 
     @Column
     private String providerId;
-
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="default_address")
-    private Address defaultAddress;
-
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="default_account")
-    private Account defaultAccount;
 
     public void update(Date birthday, String phoneNumber) {
         if (birthday != null)
@@ -76,6 +77,56 @@ public class Users extends BaseTime implements UserDetails, OAuth2User {
 
     public void updatePassword(String password) {
         this.password = password;
+    }
+
+    public void addAccount(Account account) {
+        if(account.getIsDefault()) {
+            Account preDefaultAccount = getDefaultAccount();
+            if(preDefaultAccount != null) {
+                preDefaultAccount.setIsDefault(false);
+            }
+        }
+        accounts.add(account);
+    }
+
+    public void addAddress(Address address) {
+        if(address.getIsDefault()) {
+            Address preDefaultAddress = getDefaultAddress();
+            if(preDefaultAddress != null) {
+                preDefaultAddress.setIsDefault(false);
+            }
+        }
+        addresses.add(address);
+    }
+
+    public Account getDefaultAccount() {
+        if(accounts.isEmpty()) {
+            return null;
+        }
+
+        for(Account account : accounts) {
+            if(account.getIsDefault()) {
+                return account;
+            }
+        }
+
+        // 일단 default=true인 account가 꼭 있을 거란 전제긴 하지만
+        // 만약 그렇지 않으면 추가한 순서대로.
+        return null;
+    }
+
+    public Address getDefaultAddress() {
+        if(addresses.isEmpty()) {
+            return null;
+        }
+
+        for(Address address : addresses) {
+            if(address.getIsDefault()) {
+                return address;
+            }
+        }
+
+        return null;
     }
 
 

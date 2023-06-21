@@ -1,5 +1,6 @@
 package com.pretchel.pretchel0123jwt.modules.scheduler.task;
 
+import com.pretchel.pretchel0123jwt.modules.gift.GiftService;
 import com.pretchel.pretchel0123jwt.modules.gift.domain.Gift;
 import com.pretchel.pretchel0123jwt.modules.gift.domain.GiftState;
 import com.pretchel.pretchel0123jwt.modules.gift.repository.GiftQdslRepository;
@@ -20,7 +21,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 public class FindTask {
-    private final GiftRepository giftRepository;
+    private final GiftService giftService;
 
     private final GiftQdslRepository giftQdslRepository;
 
@@ -31,17 +32,9 @@ public class FindTask {
         List<Gift> gifts = giftQdslRepository.findByDeadLine();
 
         for(Gift gift: gifts) {
-            gift.changeState(GiftState.expired);
+            giftService.expired(gift);
             eventPublisher.publishEvent(new GiftExpiredEvent(gift, gift.getEvent().getUsers()));
         }
     }
 
-    @Transactional
-    public void findCompletedGifts() {
-        List<Gift> gifts = giftRepository.findAllByState(GiftState.success);
-
-        for(Gift gift: gifts) {
-            eventPublisher.publishEvent(new GiftCompletedEvent(gift, gift.getEvent().getUsers()));
-        }
-    }
 }

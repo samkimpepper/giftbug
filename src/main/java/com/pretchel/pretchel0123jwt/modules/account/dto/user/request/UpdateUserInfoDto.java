@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class ModifyInfoDto {
+public class UpdateUserInfoDto {
     private String birthday;
     private String phoneNumber;
 }

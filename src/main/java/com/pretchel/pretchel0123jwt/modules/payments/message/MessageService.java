@@ -21,6 +21,7 @@ public class MessageService {
     private final ApplicationEventPublisher eventPublisher;
 
 
+
     @Transactional
     public void createMessage(IamportPayment payments) {
         Gift gift = payments.getGift();
@@ -33,12 +34,6 @@ public class MessageService {
                         .build();
 
         messageRepository.save(message);
-
-        // TODO: 여기서 Gift 도메인을 건드려도 되는 건가?????
-        gift.pay(message.getAmount());
-        if(gift.isGranterPrice()) {
-            gift.changeState(GiftState.success);
-        }
 
         // 알림 보냄
         Users receiver = gift.getEvent().getUsers();

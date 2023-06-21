@@ -10,6 +10,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -18,14 +20,17 @@ public class IamportPaymentService {
     private final IamportPaymentRepository iamportPaymentRepository;
     private final ApplicationEventPublisher eventPublisher;
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public IamportPayment createPayment(PaymentsCompleteDto dto, Users user, Gift gift) {
         IamportPayment payment = IamportPayment.complete(dto, user, gift);
         iamportPaymentRepository.save(payment);
 
-        eventPublisher.publishEvent(new PaymentsCompletedEvent(user, payment));
+        if(payment.getIsMember())
+            eventPublisher.publishEvent(new PaymentsCompletedEvent(user, payment));
 
         return payment;
     }
+
 
 
 }

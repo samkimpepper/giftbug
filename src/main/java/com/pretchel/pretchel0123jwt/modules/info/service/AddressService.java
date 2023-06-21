@@ -34,30 +34,25 @@ public class AddressService {
     }
 
     @Transactional
-    public void createAddress(AddressCreateDto dto, String email) {
-        Users users = userRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("잘못된 유저 이메일"));
-
-        // TODO: 내 생각엔 이것도 도메인에 메서드를 만들던지 하는게 나을 듯.
+    public void createAddress(AddressCreateDto dto, Users user) {
         Address address = Address.builder()
                 .name(dto.getName())
                 .postCode(dto.getPostCode())
                 .roadAddress(dto.getRoadAddress())
                 .detailAddress(dto.getDetailAddress())
                 .phoneNum(dto.getPhoneNum())
-                .users(users)
+                .isDefault(dto.getIsDefault())
+                .users(user)
                 .build();
 
+        user.addAddress(address);
         addressRepository.save(address);
-        if(dto.getIsDefault()) {
-            users.setDefaultAddress(address);
-        }
     }
 
-    @Transactional(readOnly = true)
-    public List<AddressListDto> getAllMyAddresses(String email) {
-        Users users = userRepository.findByEmail(email).orElseThrow(NotFoundException::new);
+    @Transactional
+    public List<AddressListDto> getAllMyAddresses(Users user) {
 
-        List<Address> addressList = addressRepository.findAllByUsers(users);
+        List<Address> addressList = user.getAddresses();
 
         return addressList
                 .stream()

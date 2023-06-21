@@ -24,16 +24,23 @@ import java.util.stream.Collectors;
 public class AccountService {
     private final AccountRepository accountRepository;
     private final UserRepository userRepository;
-    private final Response responseDto;
-    private final UserService userService;
+
 
     public Account findById(String accountId) {
         return accountRepository.findById(accountId).orElseThrow(NotFoundException::new);
     }
 
+    @Transactional(readOnly = true)
+    public Account findDefaultAccountByUser(Users user) {
+        List<Account> accounts = accountRepository.findAllByUsersAndIsDefault(user, true);
+        if(accounts.isEmpty()) {
+            return null;
+        }
+        return accounts.get(0);
+    }
+
     @Transactional
-    public void createAccount(AccountCreateDto dto, String email) {
-        Users users = userRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("잘못된 유저 이메일"));
+    public void createAccount(AccountCreateDto dto, Users user) {
 
         Account account = Account.builder()
                 .name(dto.getName())
@@ -41,14 +48,13 @@ public class AccountService {
                 .bank(dto.getBank())
                 .bankCode(dto.getBankCode())
                 .birthday(dto.getBirthday())
-                .users(users)
+                .isDefault(dto.getIsDefault())
+                .users(user)
                 .build();
 
-        accountRepository.save(account);
+        user.addAccount(account);
 
-        if(dto.getIsDefault()) {
-            users.setDefaultAccount(account);
-        }
+        accountRepository.save(account);
     }
 
     @Transactional

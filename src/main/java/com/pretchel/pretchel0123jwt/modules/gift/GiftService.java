@@ -10,7 +10,9 @@ import com.pretchel.pretchel0123jwt.modules.event.domain.Event;
 import com.pretchel.pretchel0123jwt.global.Response;
 import com.pretchel.pretchel0123jwt.modules.gift.dto.GiftCreateDto;
 import com.pretchel.pretchel0123jwt.modules.gift.dto.GiftListDto;
+import com.pretchel.pretchel0123jwt.modules.notification.event.GiftCompletedEvent;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -24,6 +26,8 @@ import java.util.stream.Collectors;
 public class GiftService {
     private final GiftRepository giftRepository;
     private final Response responseDto;
+
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public void save(GiftCreateDto dto, Event event, Account account, Address address) {
@@ -70,14 +74,32 @@ public class GiftService {
     }
 
     @Transactional
-    public void complete(String giftId) {
-        Gift gift = giftRepository.findById(giftId).orElseThrow(NotFoundException::new);
-        gift.changeState(GiftState.success);
+    public void deleteAllByEvent(Event event) {
+        giftRepository.deleteAllByEvent(event);
+    }
+
+    @Transactional
+    public void expired(Gift gift) {
+        gift.changeState(GiftState.expired);
+        if(gift.getFunded() < 1) {
+            gift.completeProcess();
+        }
+    }
+
+    @Transactional
+    public void fund(Gift gift, int amount) {
+        //gift = giftRepository.findById(gift.getId()).orElseThrow(NotFoundException::new);
+        gift.pay(amount);
+        if(gift.isGranterPrice()) {
+            gift.changeState(GiftState.success);
+            eventPublisher.publishEvent(new GiftCompletedEvent(gift, gift.getEvent().getUsers()));
+        }
     }
 
     @Transactional
     public void finish(String giftId) {
         Gift gift = giftRepository.findById(giftId).orElseThrow(NotFoundException::new);
         gift.changeState(GiftState.expired);
+
     }
 }

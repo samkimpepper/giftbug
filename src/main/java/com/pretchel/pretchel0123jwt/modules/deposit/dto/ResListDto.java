@@ -1,8 +1,10 @@
 package com.pretchel.pretchel0123jwt.modules.deposit.dto;
 
+import lombok.Builder;
 import lombok.Getter;
 
 @Getter
+@Builder
 public class ResListDto {
     private String tran_no;
     private String bank_tran_id;

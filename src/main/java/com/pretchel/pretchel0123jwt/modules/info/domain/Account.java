@@ -21,7 +21,7 @@ public class Account {
     @Column(length = 36)
     private String id;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne
     @JoinColumn(name="user_id")
     private Users users;
 
@@ -44,4 +44,7 @@ public class Account {
     private Boolean isDefault;
 
 
+    public void setIsDefault(boolean isDefault) {
+        this.isDefault = isDefault;
+    }
 }

@@ -5,6 +5,8 @@ import com.pretchel.pretchel0123jwt.modules.deposit.dto.*;
 import lombok.RequiredArgsConstructor;
 
 import lombok.extern.slf4j.Slf4j;
+import org.joda.time.DateTime;
+import org.joda.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -53,9 +55,16 @@ public class OpenbankingApi {
 
     private final RestTemplate restTemplate;
 
+    private String token;
+    private LocalDateTime expiredAt;
+
 
     // TODO: 여기 인자들 DTO에 담아야하나. 너무 복잡.
-    public OpenbankingDepositResponseDto depositAmount(String token, String amount, String reqClientName, String reqClientBankCode, String reqClientAccountNum) {
+    public OpenbankingDepositResponseDto depositAmount(String amount, String reqClientName, String reqClientBankCode, String reqClientAccountNum) {
+
+        if(expiredAt.isBefore(LocalDateTime.now())) {
+            token = getToken();
+        }
 
         String newBankTranId = bankTranId;
         newBankTranId = newBankTranId.concat(generateRandomString());
@@ -107,7 +116,11 @@ public class OpenbankingApi {
         return response.getBody();
     }
 
-    public DepositResultCheckResponseDto depositResultCheck(OpenbankingDeposit payment, String token) {
+    public DepositResultCheckResponseDto depositResultCheck(OpenbankingDeposit payment) {
+        if(expiredAt.isBefore(LocalDateTime.now())) {
+            token = getToken();
+        }
+
         // Parameters
         CheckReqListDto checkReqListDto = new CheckReqListDto(payment);
         DepositResultCheckDto depositResultCheckDto = new DepositResultCheckDto(payment, checkReqListDto);
@@ -136,6 +149,7 @@ public class OpenbankingApi {
 
 
     public String getToken() {
+
         // Body
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("client_id", clientId);
@@ -161,6 +175,11 @@ public class OpenbankingApi {
 
         log.info("Openbanking Token: " + response.getBody().getAccess_token());
         //log.info("왜 안되냐면: " + response.getBody());
+
+        token = response.getBody().getAccess_token();
+        int expiredMinutes = Integer.parseInt(response.getBody().getExpires_in());
+        expiredAt = LocalDateTime.now();
+        expiredAt = expiredAt.plusMinutes(expiredMinutes);
 
         return response.getBody().getAccess_token();
 

@@ -1,5 +1,6 @@
 package com.pretchel.pretchel0123jwt.modules.gift.domain;
 
+import com.pretchel.pretchel0123jwt.modules.account.domain.Users;
 import com.pretchel.pretchel0123jwt.modules.model.BaseTime;
 import com.pretchel.pretchel0123jwt.modules.event.domain.Event;
 import com.pretchel.pretchel0123jwt.modules.info.domain.Account;
@@ -41,12 +42,8 @@ public class CompletedGift extends BaseTime {
     private GiftState state;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="event_id", nullable = false)
-    private Event event;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="account_id", nullable = false)
-    private Account account;
+    @JoinColumn(name="user_id")
+    private Users user;
 
     public static CompletedGift fromGift(Gift gift) {
         return CompletedGift.builder()
@@ -55,8 +52,7 @@ public class CompletedGift extends BaseTime {
                 .funded(gift.getFunded())
                 .deadLine(gift.getDeadLine())
                 .state(gift.getState())
-                .event(gift.getEvent())
-                .account(gift.getAccount())
+                .user(gift.getEvent().getUsers())
                 .build();
     }
 

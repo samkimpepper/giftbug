@@ -64,7 +64,7 @@ public class Gift extends BaseTime {
     @JoinColumn(name="account_id", nullable = false)
     private Account account;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="address_id", nullable = false)
     private Address address;
 
@@ -79,6 +79,7 @@ public class Gift extends BaseTime {
     public void changeState(GiftState state) {
         this.state = state;
     }
+
 
     public void completeProcess() {
         processState = ProcessState.completed;

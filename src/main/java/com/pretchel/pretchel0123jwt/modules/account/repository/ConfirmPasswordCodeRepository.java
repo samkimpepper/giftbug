@@ -8,4 +8,6 @@ import java.util.Optional;
 
 public interface ConfirmPasswordCodeRepository extends JpaRepository<ConfirmPasswordCode, String> {
     Optional<ConfirmPasswordCode> findByIdAndExpiryDateAfterAndExpired(String id, LocalDateTime now, boolean expired);
+
+    Optional<ConfirmPasswordCode> findByUserId(String userId);
 }

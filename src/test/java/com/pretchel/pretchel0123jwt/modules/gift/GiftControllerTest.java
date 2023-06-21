@@ -7,6 +7,7 @@ import com.pretchel.pretchel0123jwt.modules.account.domain.Users;
 import com.pretchel.pretchel0123jwt.modules.account.repository.UserRepository;
 import com.pretchel.pretchel0123jwt.modules.event.EventFactory;
 import com.pretchel.pretchel0123jwt.modules.event.domain.Event;
+import com.pretchel.pretchel0123jwt.modules.event.repository.EventRepository;
 import com.pretchel.pretchel0123jwt.modules.gift.dto.GiftCreateDto;
 import com.pretchel.pretchel0123jwt.modules.gift.repository.GiftRepository;
 import com.pretchel.pretchel0123jwt.modules.info.AddressAccountFactory;
@@ -39,6 +40,9 @@ public class GiftControllerTest {
     private UserRepository userRepository;
 
     @Autowired
+    private EventRepository eventRepository;
+
+    @Autowired
     private AddressAccountFactory addressAccountFactory;
 
     @Autowired
@@ -60,7 +64,10 @@ public class GiftControllerTest {
 
     @BeforeEach
     void setup() throws ParseException {
-        user = userFactory.createUser("duck12@gmail.com");
+        userFactory.createUser("duck12@gmail.com");
+        Address address = addressAccountFactory.createAddress("김오리", user, true);
+        Account account = addressAccountFactory.createAccount("김오리", user, true);
+        Event event = eventFactory.createEvent(user, "김오리", "2022-11-25");
     }
 
     @AfterEach
@@ -73,9 +80,10 @@ public class GiftControllerTest {
     @Transactional
     @DisplayName("")
     void createGiftSuccess() throws Exception {
-        Address address = addressAccountFactory.createAddress("김오리", user, true);
-        Account account = addressAccountFactory.createAccount("김오리", user, true);
-        Event event = eventFactory.createEvent(user, "김오리", "2022-11-25");
+        Users user = userRepository.findByEmail("duck12@gmail.com").orElseThrow();
+        Address address = user.getDefaultAddress();
+        Account account = user.getDefaultAccount();
+        Event event = eventRepository.findAllByUsers(user).get(0);
 
         GiftCreateDto dto = giftFactory.createGiftDto("아이폰 무선 충전기", 45000, event, account, address);
         String content = mapper.writeValueAsString(dto);
