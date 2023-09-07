@@ -4,13 +4,15 @@ spring:
     include: redis
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver
-    url: jdbc:mariadb://127.0.0.1:3306/giftbug?serverTimezone=UT
+    #url: jdbc:mariadb://127.0.0.1:3306/giftbug?serverTimezone=UT
+    url: jdbc:mariadb://giftbug-database.c2wqidr8m9u0.ap-northeast-2.rds.amazonaws.com:3306/giftbug
     username: root
-    password: 1234
+    #password: 1234
+    password: won297712
   jpa:
     open-in-view: true
     hibernate:
-      ddl-auto: none
+      ddl-auto: create
     show-sql: true
     properties:
       hibernate.format_sql: true
@@ -25,6 +27,8 @@ spring:
     hiddenmethod:
       filter:
         enabled: true
+    pathmatch:
+      matching-strategy: ant_path_matcher
   security:
     oauth2:
       client:
@@ -127,3 +131,13 @@ iamport:
   key: '0713949642152998'
   secret: 4e6d503ac4e0c8ac8095420d7dcb5ebd82f3c2e106551f600fca3f1ca7d4aab9b31da2cf364d6603
 
+springfox:
+  documentation:
+    swagger:
+      v2:
+        enabled: true
+    swagger-ui:
+      enabled: true
+    open-api:
+      enabled: true
+    enabled: true
