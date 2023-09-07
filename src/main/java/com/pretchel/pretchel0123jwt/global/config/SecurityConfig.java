@@ -52,7 +52,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return new HttpCookieOAuth2AuthorizationRequestRepository();
     }
 
-
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
@@ -73,13 +72,22 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                             "/api/user/find-password",
                             "/api/user/confirm-password",
                             "/api/user/reissue",
+                            "/api/event/page/**",
                             "/payment",
                             "/openbanking/**",
                             "/test/**",
                             "/test/payments/**",
                             "/api/payments/**",
                             "/oauth2/redirect",
-                            "/oauth2/**").permitAll()
+                            "/oauth2/**",
+                            "/swagger-ui/**",
+                            "/swagger-resources/**",
+                            "/swagger-ui.html",
+                            "/swagger/**",
+                            "/v2/api-docs/**",
+                            "/v3/api-docs/**",
+                            "/webjars/**",
+                            "/configuration/**").permitAll()
                     //.anyRequest().hasAuthority(Authority.ROLE_USER.name())
                     .anyRequest().authenticated()
                     .and()
