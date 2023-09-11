@@ -5,6 +5,7 @@ import com.pretchel.pretchel0123jwt.modules.event.domain.Event;
 import com.pretchel.pretchel0123jwt.modules.event.repository.EventRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -15,6 +16,7 @@ public class EventFactory {
     @Autowired
     EventRepository eventRepository;
 
+    @Transactional
     public Event createEvent(Users user, String nickname, String deadLine) throws ParseException {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         Date date = new Date(sdf.parse(deadLine).getTime());

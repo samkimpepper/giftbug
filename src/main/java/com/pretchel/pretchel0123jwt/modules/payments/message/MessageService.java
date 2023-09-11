@@ -20,8 +20,6 @@ public class MessageService {
     private final GiftRepository giftRepository;
     private final ApplicationEventPublisher eventPublisher;
 
-
-
     @Transactional
     public void createMessage(IamportPayment payments) {
         Gift gift = payments.getGift();

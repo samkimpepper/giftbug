@@ -52,21 +52,13 @@ public class DepositTaskTransactional {
             gift.completeProcess();
             return;
         }
-        switch (bankRspCode) {
-            case "400": case "803": case "804": case "822":
+        if(apiRspCode.equals("A0007") ||bankRspCode.equals("400") || bankRspCode.equals("803")|| bankRspCode.equals("804") || bankRspCode.equals("822")){
                 openbankingDepositService.save(OpenbankingStatus.UNCHECKED, response, gift, receiver);
                 gift.shouldCheckProcess();
                 return;
         }
 
-        if(apiRspCode.equals("A0007")) {
-            openbankingDepositService.save(OpenbankingStatus.UNCHECKED, response, gift, receiver);
-            gift.shouldCheckProcess();
-            return;
-        }
-
         openbankingDepositService.save(OpenbankingStatus.FAILED, response, gift, receiver);
-
     }
 
     @Transactional

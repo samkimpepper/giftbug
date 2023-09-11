@@ -18,15 +18,14 @@ import org.springframework.transaction.annotation.Transactional;
 public class IamportMessageService {
     private final IamportPaymentService iamportPaymentService;
     private final MessageService messageService;
-
     private final GiftService giftService;
 
 
     @Transactional
     public void createPaymentNMessage(PaymentsCompleteDto dto, Users user, Gift gift) {
         IamportPayment payment = iamportPaymentService.createPayment(dto, user, gift); // IamportPayment 엔티티 save
-        messageService.createMessage(payment); // Message 엔티티 save
-        giftService.fund(gift, payment.getAmount()); // Gift 엔티티 상태 변경. 적용이 안 됨
+        messageService.createMessage(payment);
+        giftService.fund(gift, payment.getAmount());
     }
 
     /*

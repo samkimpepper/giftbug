@@ -1,7 +1,6 @@
 package com.pretchel.pretchel0123jwt.global.config;
 
 import org.springframework.http.HttpHeaders;
-import org.springframework.stereotype.Component;
 import org.springframework.web.filter.GenericFilterBean;
 
 import javax.servlet.*;

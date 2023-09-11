@@ -93,9 +93,6 @@ public class DepositTaskTest {
     @Autowired
     private IamportPaymentRepository paymentRepository;
 
-    @Autowired
-    private UserSettingService userSettingService;
-
     @BeforeEach
     public void setup() throws Exception {
         userFactory.createUser("duck12@gmail.com");
@@ -138,6 +135,7 @@ public class DepositTaskTest {
 
         OpenbankingDeposit deposit = depositRepository.findAllByGift(gift, Sort.by(Sort.Direction.DESC, "createDate")).get(0);
         gift = giftRepository.findById(gift.getId()).orElseThrow();
+
         assertThat(deposit.getStatus(), equalTo(OpenbankingStatus.PAID));
         assertThat(gift.getProcessState(), equalTo(ProcessState.completed));
         assertThat(deposit.getGift().getId(), equalTo(gift.getId()));
@@ -154,6 +152,7 @@ public class DepositTaskTest {
 
         Gift gift = giftRepository.findAllByEvent(event).get(0);
         OpenbankingDeposit deposit = depositRepository.findAllByGift(gift, Sort.by(Sort.Direction.DESC, "createDate")).get(0);
+
         assertThat(deposit.getStatus(), equalTo(OpenbankingStatus.UNCHECKED));
         assertThat(gift.getProcessState(), equalTo(ProcessState.check));
         assertThat(deposit.getGift().getId(), equalTo(gift.getId()));
@@ -172,6 +171,7 @@ public class DepositTaskTest {
 
         Gift gift = giftRepository.findAllByEvent(event).get(0);
         OpenbankingDeposit deposit = depositRepository.findAllByGift(gift, Sort.by(Sort.Direction.DESC, "createDate")).get(0);
+
         assertThat(deposit.getStatus(), equalTo(OpenbankingStatus.PAID));
         assertThat(gift.getProcessState(), equalTo(ProcessState.completed));
     }

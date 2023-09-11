@@ -8,7 +8,6 @@ import javax.validation.constraints.NotEmpty;
 public class ReissueDto {
     @NotEmpty
     private String accessToken;
-
     @NotEmpty
     private String refreshToken;
 }

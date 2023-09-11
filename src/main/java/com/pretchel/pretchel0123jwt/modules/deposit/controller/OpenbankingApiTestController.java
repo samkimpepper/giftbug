@@ -4,6 +4,7 @@ import com.pretchel.pretchel0123jwt.global.ResponseDto;
 import com.pretchel.pretchel0123jwt.infra.OpenbankingApi;
 import com.pretchel.pretchel0123jwt.modules.deposit.dto.DepositTestDto;
 import com.pretchel.pretchel0123jwt.modules.deposit.dto.OpenbankingDepositResponseDto;
+import io.swagger.annotations.Api;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RequiredArgsConstructor
 @RestController
+@Api(value = "오픈뱅킹 입금 테스트")
 public class OpenbankingApiTestController {
     @Value("${openbanking.client-id}")
     private String clientId;

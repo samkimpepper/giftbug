@@ -30,4 +30,5 @@ public interface GiftRepository extends JpaRepository<Gift, String> {
     Boolean existsByAddress(Address address);
 
     void deleteAllByEvent(Event event);
+
 }

@@ -1,6 +1,5 @@
 package com.pretchel.pretchel0123jwt.modules.event.service;
 
-import com.pretchel.pretchel0123jwt.global.Response;
 import com.pretchel.pretchel0123jwt.global.exception.NotFoundException;
 import com.pretchel.pretchel0123jwt.global.exception.S3UploadException;
 import com.pretchel.pretchel0123jwt.global.util.S3Uploader;
@@ -9,7 +8,6 @@ import com.pretchel.pretchel0123jwt.modules.event.domain.Event;
 import com.pretchel.pretchel0123jwt.modules.event.dto.event.EventCreateDto;
 import com.pretchel.pretchel0123jwt.modules.event.dto.event.EventDetailDto;
 import com.pretchel.pretchel0123jwt.modules.event.dto.event.EventListDto;
-import com.pretchel.pretchel0123jwt.modules.event.dto.event.ProfileResponseDto;
 import com.pretchel.pretchel0123jwt.modules.event.repository.EventRepository;
 import com.pretchel.pretchel0123jwt.modules.gift.GiftService;
 import com.pretchel.pretchel0123jwt.modules.gift.dto.GiftListDto;
@@ -20,8 +18,6 @@ import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,7 +36,6 @@ public class EventService {
     private final EventRepository eventRepository;
     private final GiftRepository giftRepository;
     private final GiftService giftService;
-    private final Response responseDto;
     private final S3Uploader s3Uploader;
     private final ModelMapper modelMapper;
 
@@ -103,14 +98,8 @@ public class EventService {
                 .collect(Collectors.toList());
     }
 
-    public ResponseEntity<?> getAllProfiles() {
-        List<Event> profiles = eventRepository.findAll();
-
-        return responseDto.success(profiles, "모든 프로필", HttpStatus.OK);
-    }
-
     @Transactional(readOnly = true)
-    public ResponseEntity<?> findAllByOrderByCreateDate(int pageNum, int profilesPerPage) {
+    public List<EventListDto> findAllByOrderByCreateDate(int pageNum, int profilesPerPage) {
         Page<Event> pages = eventRepository.findAll(
                 PageRequest.of(pageNum - 1, profilesPerPage, Sort.by(Sort.Direction.DESC, "createDate"))
         );
@@ -119,12 +108,12 @@ public class EventService {
 //                .map(ProfileResponseDto.View::new)
 //                .collect(Collectors.toList());
 
-        List<Event> profiles = pages.getContent();
-        List<ProfileResponseDto.View> profileDtos = profiles.stream()
-                .map(profile -> modelMapper.map(profile, ProfileResponseDto.View.class))
+        List<Event> events = pages.getContent();
+        List<EventListDto> eventList = events.stream()
+                .map(EventListDto::fromEvent)
                 .collect(Collectors.toList());
-
-        return responseDto.success(profileDtos, "모든프로필 근데 맵핑 안함 ㅠㅠ", HttpStatus.OK);
+        log.info("이벤트 닉넴:" + eventList.get(0).getNickname());
+        return eventList;
     }
 
     @Transactional(readOnly = true)
@@ -144,12 +133,10 @@ public class EventService {
     }
 
     @Transactional
-    public ResponseEntity<?> delete(String eventId) {
+    public void delete(String eventId) {
         Event event = eventRepository.findById(eventId).orElseThrow(NotFoundException::new);
 
         giftRepository.deleteAllByEvent(event);
         eventRepository.delete(event);
-
-        return responseDto.success("삭제 완료");
     }
 }

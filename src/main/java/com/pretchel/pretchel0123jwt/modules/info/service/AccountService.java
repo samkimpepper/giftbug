@@ -4,8 +4,6 @@ import com.pretchel.pretchel0123jwt.global.exception.NotFoundException;
 import com.pretchel.pretchel0123jwt.modules.account.domain.Users;
 import com.pretchel.pretchel0123jwt.modules.info.dto.account.AccountCreateDto;
 import com.pretchel.pretchel0123jwt.modules.info.dto.account.AccountListDto;
-import com.pretchel.pretchel0123jwt.global.Response;
-import com.pretchel.pretchel0123jwt.modules.account.service.UserService;
 import com.pretchel.pretchel0123jwt.modules.info.domain.Account;
 import com.pretchel.pretchel0123jwt.modules.info.repository.AccountRepository;
 import com.pretchel.pretchel0123jwt.modules.account.repository.UserRepository;

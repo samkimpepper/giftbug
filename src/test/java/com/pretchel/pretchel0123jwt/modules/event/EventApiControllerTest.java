@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.List;
 
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -83,6 +84,47 @@ class EventApiControllerTest {
         accountRepository.deleteAll();
         addressRepository.deleteAll();
         userRepository.deleteAll();
+    }
+
+    @Test
+    @WithMockCustomUser
+    public void event_pagination_success() throws Exception {
+        Users user = userRepository.findByEmail("duck12@gmail.com").orElseThrow();
+        addressAccountFactory.createAccount("김오리", user, true);
+        addressAccountFactory.createAddress("김오리", user, true);
+        generateMultipleEvent(user);
+        Event event = eventRepository.findAllByUsers(user).get(0);
+
+        mvc.perform(get("/api/event/page/1"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.pageInfo.currentPageNum").value(1))
+                .andExpect(jsonPath("$.data.pageInfo.blockLastPageNum").value(2))
+                .andExpect(jsonPath("$.data.pageInfo.totalEventCount").value(17))
+                .andExpect(jsonPath("$.data.eventList.length()").value(12))
+                .andExpect(jsonPath("$.data.eventList[0].nickname").value("오리17"));
+
+        // TODO: 오리1이 젤 먼저나와야.. 젤 일찍 나온 애가. 근데 DESC가 아니라 뭘 해야하지? 애초에 DESC가 뭐지? 나중에 하자^^
+    }
+
+    private void generateMultipleEvent(Users user) throws Exception{
+        eventFactory.createEvent(user, "오리1", "2023-07-07");
+        eventFactory.createEvent(user, "오리2", "2023-07-07");
+        eventFactory.createEvent(user, "오리3", "2023-07-07");
+        eventFactory.createEvent(user, "오리4", "2023-07-07");
+        eventFactory.createEvent(user, "오리5", "2023-07-07");
+        eventFactory.createEvent(user, "오리6", "2023-07-07");
+        eventFactory.createEvent(user, "오리7", "2023-07-07");
+        eventFactory.createEvent(user, "오리8", "2023-07-07");
+        eventFactory.createEvent(user, "오리9", "2023-07-07");
+        eventFactory.createEvent(user, "오리10", "2023-07-07");
+        eventFactory.createEvent(user, "오리11", "2023-07-07");
+        eventFactory.createEvent(user, "오리12", "2023-07-07");
+        eventFactory.createEvent(user, "오리13", "2023-07-07");
+        eventFactory.createEvent(user, "오리14", "2023-07-07");
+        eventFactory.createEvent(user, "오리15", "2023-07-07");
+        eventFactory.createEvent(user, "오리16", "2023-07-07");
+        eventFactory.createEvent(user, "오리17", "2023-07-07");
     }
 
     @Test
@@ -210,7 +252,7 @@ class EventApiControllerTest {
 
 
     // MultipartFile 객체 만드는 로직 ===================================================================================
-    MockMultipartFile mockMultipartUpload() throws IOException {
+    private MockMultipartFile mockMultipartUpload() throws IOException {
         String fileName = "fluffy-cow";
         String contentType = "jpg";
         String filePath = "src/test/resources/images/fluffy-cow.jpg";

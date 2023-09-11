@@ -19,6 +19,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 @Service
 @RequiredArgsConstructor
@@ -57,6 +58,8 @@ public class OpenbankingApi {
 
     private String token;
     private LocalDateTime expiredAt;
+
+    private static final Random RANDOM = new Random();
 
 
     // TODO: 여기 인자들 DTO에 담아야하나. 너무 복잡.
@@ -144,10 +147,6 @@ public class OpenbankingApi {
         return response.getBody();
 
     }
-
-
-
-
     public String getToken() {
 
         // Body
@@ -195,18 +194,17 @@ public class OpenbankingApi {
         int len = 9;
         String alpha = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
         int alphaLen = alpha.length();
-        Random random = new Random();
 
         StringBuffer code = new StringBuffer();
         for(int i = 0; i < len; i++) {
-            code.append(alpha.charAt(random.nextInt(alphaLen)));
+            code.append(alpha.charAt(RANDOM.nextInt(alphaLen)));
         }
+        // ThreadLocalRandom.current().nextInt();
 
         return code.toString();
     }
 
     private String getCurrentDateTime() {
-        //LocalDateTime now = LocalDateTime.now();
         Timestamp now = new Timestamp(System.currentTimeMillis());
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddhhmmss");
         return sdf.format(now);

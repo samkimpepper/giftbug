@@ -4,7 +4,7 @@ import lombok.Getter;
 
 @Getter
 public class S3UploadException extends RuntimeException {
-    private String code;
+    private final String code;
 
     public S3UploadException() {
         super();

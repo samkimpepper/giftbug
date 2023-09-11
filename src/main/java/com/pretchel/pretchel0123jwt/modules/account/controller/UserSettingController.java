@@ -10,6 +10,8 @@ import com.pretchel.pretchel0123jwt.modules.account.repository.UserRepository;
 import com.pretchel.pretchel0123jwt.modules.account.service.UserSettingService;
 import com.pretchel.pretchel0123jwt.modules.info.domain.Account;
 import com.pretchel.pretchel0123jwt.modules.info.service.AccountService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @RequestMapping("/api/user")
 @RestController
+//@Api(value="사용자 정보 변경 컨트롤러")
 public class UserSettingController {
     private final UserSettingService userSettingService;
 
@@ -27,6 +30,7 @@ public class UserSettingController {
     private final UserRepository userRepository;
 
     @PutMapping("/update")
+    //@ApiOperation(value = "내 정보 변경", notes = "생일과 전화번호 변경 가능")
     public ResponseDto.Empty update(@RequestBody UpdateUserInfoDto dto) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         userSettingService.update(dto, email);
@@ -34,6 +38,7 @@ public class UserSettingController {
     }
 
     @GetMapping("/user-info")
+    //@ApiOperation(value = "내 정보 조회")
     public ResponseDto.Data<UserInfoDto> userInfo() {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         Users user = userRepository.findByEmail(email).orElseThrow(NotFoundException::new);
@@ -44,6 +49,7 @@ public class UserSettingController {
 
 
     @PutMapping("/update-password")
+    //@ApiOperation(value = "비밀번호 변경")
     public ResponseDto.Empty updatePassword(@RequestBody UpdatePasswordDto dto) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         userSettingService.updatePassword(dto, email);

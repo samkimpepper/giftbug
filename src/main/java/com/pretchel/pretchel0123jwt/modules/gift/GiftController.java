@@ -12,6 +12,8 @@ import com.pretchel.pretchel0123jwt.modules.info.repository.AccountRepository;
 import com.pretchel.pretchel0123jwt.modules.info.repository.AddressRepository;
 import com.pretchel.pretchel0123jwt.modules.info.service.AccountService;
 import com.pretchel.pretchel0123jwt.modules.info.service.AddressService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
@@ -21,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/gift")
+//@Api(value = "선물 컨트롤러")
 public class GiftController {
     private final GiftService giftService;
     private final EventService eventService;
@@ -28,6 +31,7 @@ public class GiftController {
     private final AddressRepository addressRepository;
 
     @PostMapping
+    //@ApiOperation(value = "선물 생성", notes = "선물이 속할 이벤트가 존재해야 선물 생성 가능")
     public ResponseDto.Empty save(@RequestBody GiftCreateDto dto) {
         if(!StringUtils.hasText(dto.getAccountId()) || !StringUtils.hasText(dto.getAddressId())) {
             throw new EmptyValueExistsException();
@@ -43,6 +47,7 @@ public class GiftController {
 
     // 강제 만료
     @PutMapping("/finish/{id}")
+    //@ApiOperation(value = "선물 강제 마감")
     public ResponseDto.Empty finish(@PathVariable("id") String id) {
         giftService.finish(id);
         return new ResponseDto.Empty();

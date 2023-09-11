@@ -55,12 +55,16 @@ public class Gift extends BaseTime {
     @Column(nullable = false)
     private String story;
 
+    @Column
+    @Builder.Default
+    private int wishes = 0;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="event_id", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Event event;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="account_id", nullable = false)
     private Account account;
 
@@ -100,5 +104,9 @@ public class Gift extends BaseTime {
 
     public boolean isGranterPrice() {
         return (funded >= price);
+    }
+
+    public void increaseWishesCount() {
+        this.wishes++;
     }
 }

@@ -2,6 +2,7 @@ package com.pretchel.pretchel0123jwt.modules.event.dto.event;
 
 import com.pretchel.pretchel0123jwt.modules.event.domain.Event;
 import com.pretchel.pretchel0123jwt.modules.gift.dto.GiftListDto;
+import io.swagger.annotations.ApiModel;
 import lombok.Builder;
 import lombok.Getter;
 

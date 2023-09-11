@@ -42,7 +42,6 @@ public class Users extends BaseTime implements UserDetails, OAuth2User {
     @ElementCollection(fetch = FetchType.EAGER)
     @Builder.Default
     private List<String> roles = new ArrayList<>();
-
     @Column
     private String gender;
 
@@ -53,12 +52,10 @@ public class Users extends BaseTime implements UserDetails, OAuth2User {
     @Column
     private String phoneNumber;
 
-    @OneToMany(cascade = CascadeType.REMOVE)
-    @JoinColumn(name="account_id")
+    @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "users")
     private List<Account> accounts = new ArrayList<>();
 
-    @OneToMany(cascade = CascadeType.REMOVE)
-    @JoinColumn(name="address_id")
+    @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "users")
     private List<Address> addresses = new ArrayList<>();
 
     @Column

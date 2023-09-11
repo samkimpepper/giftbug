@@ -3,11 +3,12 @@ package com.pretchel.pretchel0123jwt.modules.gift;
 import com.pretchel.pretchel0123jwt.global.exception.NotFoundException;
 import com.pretchel.pretchel0123jwt.modules.gift.domain.Gift;
 import com.pretchel.pretchel0123jwt.modules.gift.domain.GiftState;
+import com.pretchel.pretchel0123jwt.modules.gift.dto.GiftDetailDto;
+import com.pretchel.pretchel0123jwt.modules.gift.repository.GiftQdslRepository;
 import com.pretchel.pretchel0123jwt.modules.gift.repository.GiftRepository;
 import com.pretchel.pretchel0123jwt.modules.info.domain.Account;
 import com.pretchel.pretchel0123jwt.modules.info.domain.Address;
 import com.pretchel.pretchel0123jwt.modules.event.domain.Event;
-import com.pretchel.pretchel0123jwt.global.Response;
 import com.pretchel.pretchel0123jwt.modules.gift.dto.GiftCreateDto;
 import com.pretchel.pretchel0123jwt.modules.gift.dto.GiftListDto;
 import com.pretchel.pretchel0123jwt.modules.notification.event.GiftCompletedEvent;
@@ -25,7 +26,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class GiftService {
     private final GiftRepository giftRepository;
-    private final Response responseDto;
+
+    private final GiftQdslRepository giftQdslRepository;
 
     private final ApplicationEventPublisher eventPublisher;
 
@@ -59,23 +61,31 @@ public class GiftService {
     }
 
     @Transactional
-    public ResponseEntity<?> getGiftDetail(String giftId) {
+    public GiftDetailDto getGiftDetail(String giftId) {
         Gift gift = giftRepository.findById(giftId).orElseThrow(NotFoundException::new);
 
-        return responseDto.success(gift, "선물 대령", HttpStatus.OK);
+        return GiftDetailDto.from(gift);
     }
 
     @Transactional
-    public ResponseEntity<?> delete(String giftId) {
+    public void delete(String giftId) {
         Gift gift = giftRepository.findById(giftId).orElseThrow(NotFoundException::new);
 
         giftRepository.delete(gift);
-        return responseDto.success("당신은 소중한 선물 하나를 죽여버렸습니다");
     }
 
     @Transactional
     public void deleteAllByEvent(Event event) {
         giftRepository.deleteAllByEvent(event);
+    }
+
+    @Transactional
+    public List<GiftListDto> getMostSupportedGifts() {
+        List<Gift> gifts = giftQdslRepository.findGiftsWithMostMessages();
+        return gifts.stream().map(
+                gift -> {
+                    return GiftListDto.fromGift(gift);
+                }).collect(Collectors.toList());
     }
 
     @Transactional
@@ -101,5 +111,10 @@ public class GiftService {
         Gift gift = giftRepository.findById(giftId).orElseThrow(NotFoundException::new);
         gift.changeState(GiftState.expired);
 
+    }
+
+    @Transactional
+    public void increaseWishCount(Gift gift) {
+        gift.increaseWishesCount();
     }
 }

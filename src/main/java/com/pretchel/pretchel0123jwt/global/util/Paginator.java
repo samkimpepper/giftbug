@@ -105,9 +105,9 @@ public class Paginator {
         result.put("blockLastPageNum", blockLastPageNum);
         result.put("blockFirstPageNum", blockFirstPageNum);
         result.put("currentPageNum", currentPageNum);
-        result.put("totalPostCount", totalProfileCount);
+        result.put("totalEventCount", totalProfileCount);
         result.put("pagesPerBlock", pagesPerBlock);
-        result.put("postsPerPage", profilesPerPage);
+        result.put("eventsPerPage", profilesPerPage);
         result.put("pageList", pageList);
 
         return result;

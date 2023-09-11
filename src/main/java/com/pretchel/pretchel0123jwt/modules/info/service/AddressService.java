@@ -6,13 +6,11 @@ import com.pretchel.pretchel0123jwt.modules.account.domain.Users;
 import com.pretchel.pretchel0123jwt.modules.info.dto.address.AddressCreateDto;
 import com.pretchel.pretchel0123jwt.modules.info.domain.Address;
 import com.pretchel.pretchel0123jwt.modules.info.dto.address.AddressListDto;
-import com.pretchel.pretchel0123jwt.global.Response;
 import com.pretchel.pretchel0123jwt.modules.info.repository.AddressRepository;
 import com.pretchel.pretchel0123jwt.modules.account.repository.UserRepository;
 import com.pretchel.pretchel0123jwt.modules.gift.repository.GiftRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,7 +25,6 @@ public class AddressService {
     private final AddressRepository addressRepository;
     private final UserRepository userRepository;
     private final GiftRepository giftRepository;
-    private final Response responseDto;
 
     public Address findById(String addressId) {
         return addressRepository.findById(addressId).orElseThrow(NotFoundException::new);
