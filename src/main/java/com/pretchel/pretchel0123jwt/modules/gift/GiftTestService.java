@@ -12,6 +12,7 @@ import com.pretchel.pretchel0123jwt.modules.info.repository.AccountRepository;
 import com.pretchel.pretchel0123jwt.modules.info.repository.AddressRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Random;
@@ -31,6 +32,7 @@ public class GiftTestService {
     , "이불", "자켓", "슬랙스", "아이패드", "로퍼"};
     private int[] prices = new int[35];
 
+    @Transactional
     public void createAllGifts() {
         List<Event> events = eventRepository.findAll();
         for(Event event : events) {
