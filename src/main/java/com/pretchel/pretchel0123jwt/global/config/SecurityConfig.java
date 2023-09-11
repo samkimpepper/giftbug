@@ -73,7 +73,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                             "/api/user/confirm-password",
                             "/api/user/reissue",
                             "/api/event/page/**",
-                            "/gifts/**",
+                            "/gifts/most-supported",
                             "/payment",
                             "/openbanking/**",
                             "/test/**",

@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Random;
@@ -32,6 +33,7 @@ public class PaymentMessageTestService {
 
     private int[] prices = {5000, 10000, 15000, 20000, 25000, 30000};
 
+    @Transactional
     public void createPaymentAndMessagePerAllGifts() {
         Random random = new Random();
         List<Gift> gifts = giftRepository.findAll();
