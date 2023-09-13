@@ -57,7 +57,7 @@ public class Gift extends BaseTime {
 
     @Column
     @Builder.Default
-    private int wishes = 0;
+    private Integer wishes = 0;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="event_id", nullable = false)
@@ -108,5 +108,9 @@ public class Gift extends BaseTime {
 
     public void increaseWishesCount() {
         this.wishes++;
+    }
+
+    public void decreaseWishesCount() {
+        this.wishes--;
     }
 }

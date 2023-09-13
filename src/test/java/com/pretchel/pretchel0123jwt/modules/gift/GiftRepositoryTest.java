@@ -1,6 +1,7 @@
 package com.pretchel.pretchel0123jwt.modules.gift;
 
 
+import com.pretchel.pretchel0123jwt.config.WithMockCustomUser;
 import com.pretchel.pretchel0123jwt.modules.account.UserFactory;
 import com.pretchel.pretchel0123jwt.modules.account.domain.Users;
 import com.pretchel.pretchel0123jwt.modules.account.repository.UserRepository;
@@ -17,6 +18,7 @@ import com.pretchel.pretchel0123jwt.modules.notification.NotificationRepository;
 import com.pretchel.pretchel0123jwt.modules.payment.PaymentFactory;
 import com.pretchel.pretchel0123jwt.modules.payments.iamport.repository.IamportPaymentRepository;
 import com.pretchel.pretchel0123jwt.modules.payments.message.MessageRepository;
+import com.pretchel.pretchel0123jwt.modules.wish.WishRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,12 +28,17 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -73,6 +80,12 @@ public class GiftRepositoryTest {
     @Autowired
     private NotificationRepository notificationRepository;
 
+    @Autowired
+    private WishRepository wishRepository;
+
+    @Autowired
+    MockMvc mvc;
+
     @BeforeEach
     public void setup() throws Exception {
 
@@ -110,16 +123,32 @@ public class GiftRepositoryTest {
         assertThat(gifts.get(0).getName(), equalTo("마우스"));
         assertThat(gifts.get(2).getName(), equalTo("조명"));
     }
+
+    @Test
+    @WithMockCustomUser
+    public void test_most_wished_gifts() throws Exception {
+        Users user = userRepository.findByEmail("duck12@gmail.com").orElseThrow();
+        Event event = eventRepository.findAllByUsers(user).get(0);
+        Gift gift = giftRepository.findAllByEvent(event).get(1);
+
+        mvc.perform(post("/api/wish")
+                        .param("giftId", gift.getId())
+                        .accept(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isOk());
+
+        List<Gift> gifts = giftRepository.findAllByOrderByWishesDesc();
+        assertThat(gifts.get(0).getWishes(), equalTo(1));
+    }
     @AfterEach
     void clean() {
+        wishRepository.deleteAll();
         messageRepository.deleteAll();
         paymentRepository.deleteAll();
         giftRepository.deleteAll();
         eventRepository.deleteAll();
         addressAccountFactory.deleteAll();
         notificationRepository.deleteAll();
-        userRepository.deleteAll();
-
         userRepository.deleteAll();
     }
 

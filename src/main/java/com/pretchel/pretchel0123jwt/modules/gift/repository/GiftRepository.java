@@ -31,4 +31,6 @@ public interface GiftRepository extends JpaRepository<Gift, String> {
 
     void deleteAllByEvent(Event event);
 
+    List<Gift> findAllByOrderByWishesDesc();
+
 }

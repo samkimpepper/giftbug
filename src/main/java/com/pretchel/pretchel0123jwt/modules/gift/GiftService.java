@@ -117,4 +117,9 @@ public class GiftService {
     public void increaseWishCount(Gift gift) {
         gift.increaseWishesCount();
     }
+
+    @Transactional
+    public void decreaseWishCount(Gift gift) {
+        gift.decreaseWishesCount();
+    }
 }

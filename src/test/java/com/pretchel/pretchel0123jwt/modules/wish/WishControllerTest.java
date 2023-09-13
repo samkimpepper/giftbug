@@ -26,10 +26,13 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -38,6 +41,9 @@ public class WishControllerTest {
 
     @Autowired
     private WishRepository wishRepository;
+
+    @Autowired
+    private WishService wishService;
     @Autowired
     private UserFactory userFactory;
 
@@ -70,7 +76,7 @@ public class WishControllerTest {
 
     Gift gift;
 
-    @Before
+    @BeforeEach
     public void setup() throws Exception {
         userFactory.createUser("duck12@gmail.com");
         Users user = userRepository.findByEmail("duck12@gmail.com").orElseThrow();
@@ -80,9 +86,8 @@ public class WishControllerTest {
 
         Event event = eventFactory.createEvent(user, "오뤼", "2023-06-10");
 
-        //
         gift = giftFactory.createGift("이어폰", 300000, event, account, address);
-
+        giftFactory.createGift("마우스", 78000, event, account, address);
     }
 
     @Test
@@ -98,12 +103,60 @@ public class WishControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk());
 
-        Wish wish = wishRepository.findAll().get(0);
+        Wish wish = wishRepository.findAllByUserFetchJoin(user).get(0);
 
-        assertThat(wish.getUser(), equalTo(user));
-        assertThat(wish.getGift(), equalTo(gift));
-        assertThat(gift.getWishes(), equalTo(1));
+        assertThat(wish.getUser().getEmail(), equalTo(user.getEmail()));
+
+        wish = wishRepository.findAllByGiftFetchJoin(gift).get(0);
+        assertThat(wish.getGift().getName(), equalTo(gift.getName()));
+        assertThat(wish.getGift().getWishes(), equalTo(1));
+
+        wishService.delete(user, gift);
     }
+
+    @Test
+    @WithMockCustomUser
+    public void test_my_wishlist() throws Exception {
+        Users user = userRepository.findByEmail("duck12@gmail.com").orElseThrow();
+        Event event = eventRepository.findAllByUsers(user).get(0);
+        Gift gift = giftRepository.findAllByEvent(event).get(0);
+        wishService.create(user, gift);
+
+        mvc.perform(get("/api/wish")
+                .accept(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.length()").value(1));
+
+    }
+
+    @Test
+    @WithMockCustomUser
+    public void test_unwish() throws Exception {
+        Users user = userRepository.findByEmail("duck12@gmail.com").orElseThrow();
+        Event event = eventRepository.findAllByUsers(user).get(0);
+        Gift gift = giftRepository.findAllByEvent(event).get(0);
+
+        mvc.perform(post("/api/wish")
+                        .param("giftId", gift.getId())
+                        .accept(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isOk());
+        gift = giftRepository.findById(gift.getId()).orElseThrow();
+        assertThat(gift.getWishes(), equalTo(1));
+
+        mvc.perform(delete("/api/wish")
+                .param("giftId", gift.getId())
+                .accept(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isOk());
+
+        gift = giftRepository.findById(gift.getId()).orElseThrow();
+        assertThat(gift.getWishes(), equalTo(0));
+
+    }
+
+
 
     @AfterEach
     public void clean() {
