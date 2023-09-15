@@ -33,4 +33,7 @@ public interface GiftRepository extends JpaRepository<Gift, String> {
 
     List<Gift> findAllByOrderByWishesDesc();
 
+    @Query("select g from Gift g limit 1000")
+    List<Gift> findLimitedGifts();
+
 }

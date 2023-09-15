@@ -24,7 +24,7 @@ public class WishTestService {
     @Transactional
     public void generateTestWishes() {
         List<Users> users = userRepository.findAll();
-        List<Gift> gifts = giftRepository.findAll();
+        List<Gift> gifts = giftRepository.findLimitedGifts();
         int giftsLength = gifts.size();
         Random random = new Random();
 
