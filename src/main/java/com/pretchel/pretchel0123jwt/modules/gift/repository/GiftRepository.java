@@ -5,16 +5,17 @@ import com.pretchel.pretchel0123jwt.modules.gift.domain.GiftState;
 import com.pretchel.pretchel0123jwt.modules.gift.domain.ProcessState;
 import com.pretchel.pretchel0123jwt.modules.info.domain.Address;
 import com.pretchel.pretchel0123jwt.modules.event.domain.Event;
-import org.apache.ibatis.annotations.Param;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
 public interface GiftRepository extends JpaRepository<Gift, String> {
 
     @Query("select g from Gift g where g.event = ?1")
-    List<Gift> findAllByEventId(Event event);
+    List<Gift> findAllByEventId(@Param("event") Event event);
 
     List<Gift> findAllByEvent(Event event);
 
@@ -32,7 +33,6 @@ public interface GiftRepository extends JpaRepository<Gift, String> {
     void deleteAllByEvent(Event event);
 
     List<Gift> findAllByOrderByWishesDesc();
-
 
     List<Gift> findTop1000ByOrderByIdDesc();
 

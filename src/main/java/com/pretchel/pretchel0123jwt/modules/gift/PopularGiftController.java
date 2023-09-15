@@ -19,7 +19,7 @@ public class PopularGiftController {
     }
 
     @GetMapping("/most-wished")
-    public ResponseDto.DataList<GiftListDto> getMostLikedGifts() {
+    public ResponseDto.DataList<GiftListDto> getMostWishedGifts() {
         return new ResponseDto.DataList<>(giftService.getMostWishedGifts());
     }
 }
