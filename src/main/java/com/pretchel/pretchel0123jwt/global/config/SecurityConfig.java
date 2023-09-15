@@ -74,6 +74,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                             "/api/user/reissue",
                             "/api/event/page/**",
                             "/gifts/most-supported",
+                            "/gifts/most-wished",
                             "/payment",
                             "/openbanking/**",
                             "/test/**",

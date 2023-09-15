@@ -15,12 +15,11 @@ public class PopularGiftController {
 
     @GetMapping("/most-supported")
     public ResponseDto.DataList<GiftListDto> getMostSupportedGifts() {
-
-        return new ResponseDto.DataList(giftService.getMostSupportedGifts());
+        return new ResponseDto.DataList<>(giftService.getMostSupportedGifts());
     }
 
-//    @GetMapping("/most-liked")
-//    public ResponseDto.DataList<> getMostLikedGifts() {
-//
-//    }
+    @GetMapping("/most-wished")
+    public ResponseDto.DataList<GiftListDto> getMostLikedGifts() {
+        return new ResponseDto.DataList<>(giftService.getMostWishedGifts());
+    }
 }

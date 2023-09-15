@@ -59,4 +59,6 @@ public class GiftQdslRepository {
 
         return query.fetch();
     }
+
+
 }

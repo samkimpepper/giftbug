@@ -79,9 +79,18 @@ public class GiftService {
         giftRepository.deleteAllByEvent(event);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public List<GiftListDto> getMostSupportedGifts() {
         List<Gift> gifts = giftQdslRepository.findGiftsWithMostMessages();
+        return gifts.stream().map(
+                gift -> {
+                    return GiftListDto.fromGift(gift);
+                }).collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public List<GiftListDto> getMostWishedGifts() {
+        List<Gift> gifts = giftRepository.findAllByOrderByWishesDesc();
         return gifts.stream().map(
                 gift -> {
                     return GiftListDto.fromGift(gift);
