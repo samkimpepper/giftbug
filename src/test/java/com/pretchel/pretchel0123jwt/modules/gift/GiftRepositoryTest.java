@@ -125,6 +125,12 @@ public class GiftRepositoryTest {
     }
 
     @Test
+    public void test_limited_gifts() throws Exception {
+        List<Gift> gifts = giftRepository.findTop1000ByOrderByIdDesc();
+
+    }
+
+    @Test
     @WithMockCustomUser
     public void test_most_wished_gifts() throws Exception {
         Users user = userRepository.findByEmail("duck12@gmail.com").orElseThrow();
