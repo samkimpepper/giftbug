@@ -2,6 +2,7 @@ package com.pretchel.pretchel0123jwt.modules.gift.repository;
 
 
 import com.pretchel.pretchel0123jwt.modules.gift.domain.Gift;
+import com.pretchel.pretchel0123jwt.modules.payments.message.Message;
 import com.pretchel.pretchel0123jwt.modules.payments.message.QMessage;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.ExpressionUtils;
@@ -13,6 +14,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import javax.persistence.EntityManager;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -34,11 +36,24 @@ public class GiftQdslRepository {
                 .where(Expressions.currentDate().after(gift.deadLine)).fetch();
     }
 
+//    public List<Gift> findGiftsWithMostMessages() {
+//        JPAQuery<Gift> query = jpaQueryFactory
+//                .select(gift)
+//                .from(gift)
+//                .leftJoin(message).on(gift.id.eq(message.gift.id))
+//                .groupBy(gift.id)
+//                .orderBy(message.id.count().desc());
+//
+//        return query.fetch();
+//    }
+
     public List<Gift> findGiftsWithMostMessages() {
         JPAQuery<Gift> query = jpaQueryFactory
-                .select(gift)
-                .from(gift)
-                .leftJoin(message).on(gift.id.eq(message.gift.id))
+                .select(message.gift)
+                .from(message)
+                .leftJoin(gift)
+                .on(gift.id.eq(message.gift.id))
+                .fetchJoin()
                 .groupBy(gift.id)
                 .orderBy(message.id.count().desc());
 
