@@ -16,7 +16,7 @@ public class GiftJdbcRepository {
     private final JdbcTemplate jdbcTemplate;
 
     public void batchUpdateGifts(List<Gift> gifts) {
-        String sql = "INSERT INTO gift (name, price, deadline, funded, link, story, state, event_id, account_id, address_id) " +
+        String sql = "INSERT INTO gift (name, price, dead_line, funded, link, story, state, event_id, account_id, address_id) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
