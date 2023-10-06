@@ -17,11 +17,14 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Objects;
 
 import static net.bytebuddy.matcher.ElementMatchers.is;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.not;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.authenticated;
@@ -32,9 +35,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@Transactional
 class UsersApiControllerTest {
-
-
     @Autowired
     private UserRepository userRepository;
 
@@ -44,13 +46,8 @@ class UsersApiControllerTest {
     @Autowired
     private MockMvc mvc;
 
-    Users user;
-
-    @AfterEach
-    void clean() {
-        userRepository.deleteAll();
-    }
-
+    @Autowired
+    private UserFactory userFactory;
 
     @Test
     void signup() throws Exception {
@@ -79,6 +76,8 @@ class UsersApiControllerTest {
 
     @Test
     void login() throws Exception {
+        userFactory.createUser("duck12@gmail.com"); // password: password
+
         LoginDto dto = LoginDto.builder()
                 .email("duck12@gmail.com")
                 .password("password")
@@ -91,12 +90,15 @@ class UsersApiControllerTest {
                 .accept(MediaType.APPLICATION_JSON)
         ).andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(authenticated().withUsername("duck12@gmail.com"));
+                .andExpect(authenticated().withSecurityContext(null)) // 널이면 안되는데 통과함
+                .andExpect(authenticated().withUsername("duck12@gmail.com"))
+                .andExpect(jsonPath("$.data.accessToken", notNullValue()));
     }
 
     @Test
     @WithMockCustomUser
     void getUserInfo() throws Exception {
+        userFactory.createUser("duck12@gmail.com");
         mvc.perform(get("/api/user/user-info"))
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -106,6 +108,7 @@ class UsersApiControllerTest {
     @Test
     @WithMockCustomUser
     void updateUserInfo() throws Exception {
+        userFactory.createUser("duck12@gmail.com");
         UpdateUserInfoDto dto = UpdateUserInfoDto.builder()
                 .birthday(null)
                 .phoneNumber("01098765432")
@@ -123,6 +126,7 @@ class UsersApiControllerTest {
     @Test
     @WithMockCustomUser
     void updateInvalidBirthday() throws Exception {
+        userFactory.createUser("duck12@gmail.com");
         UpdateUserInfoDto dto = UpdateUserInfoDto.builder()
                 .birthday("1999.01.01")
                 .phoneNumber("01098765432")
@@ -144,6 +148,7 @@ class UsersApiControllerTest {
     @Test
     @WithMockCustomUser
     void updateInvalidPhoneNumber() throws Exception {
+        userFactory.createUser("duck12@gmail.com");
         UpdateUserInfoDto dto = UpdateUserInfoDto.builder()
                 .birthday("1999-01-01")
                 .phoneNumber(null)

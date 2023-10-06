@@ -55,7 +55,7 @@ public class AddressAccountFactory {
         return address;
     }
 
-    @Transactional
+
     public Account createAccount(String name, Users user, Boolean isDefault) {
         user = userRepository.findByEmailFetchJoinAccounts("duck12@gmail.com").orElseThrow();
         Account account = Account.builder()

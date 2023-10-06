@@ -38,6 +38,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.then;
 @SpringBootTest
 @AutoConfigureMockMvc
+@Transactional
 public class PasswordFindControllerTest {
     @Autowired
     ObjectMapper mapper;
@@ -57,13 +58,10 @@ public class PasswordFindControllerTest {
     @MockBean
     private EmailSender emailSender;
 
-    @BeforeEach
-    void setup() throws Exception {
-        userFactory.createUser("duck12@gmail.com");
-    }
 
     @Test
     void find_password_success() throws Exception {
+        userFactory.createUser("duck12@gmail.com");
 
         mvc.perform(post("/api/user/find-password")
                 .param("email", "duck12@gmail.com"))
@@ -78,6 +76,7 @@ public class PasswordFindControllerTest {
     @Test
     @Transactional
     void confirm_password_success() throws Exception {
+        userFactory.createUser("duck12@gmail.com");
 
         mvc.perform(post("/api/user/find-password")
                         .param("email", "duck12@gmail.com")
@@ -99,15 +98,5 @@ public class PasswordFindControllerTest {
         then(emailSender).should().sendEmail(any(SimpleMailMessage.class));
 
     }
-
-    @AfterEach
-    void clean() {
-        userRepository.deleteAll();
-        confirmPasswordCodeRepository.deleteAll();
-    }
-
-
-
-
 
 }

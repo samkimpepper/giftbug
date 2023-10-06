@@ -5,6 +5,7 @@ import com.pretchel.pretchel0123jwt.modules.event.domain.Event;
 import com.pretchel.pretchel0123jwt.modules.event.repository.EventRepository;
 import com.pretchel.pretchel0123jwt.modules.gift.domain.Gift;
 import com.pretchel.pretchel0123jwt.modules.gift.domain.GiftState;
+import com.pretchel.pretchel0123jwt.modules.gift.repository.GiftJdbcRepository;
 import com.pretchel.pretchel0123jwt.modules.gift.repository.GiftRepository;
 import com.pretchel.pretchel0123jwt.modules.info.domain.Account;
 import com.pretchel.pretchel0123jwt.modules.info.domain.Address;
@@ -14,12 +15,15 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 @Service
 @RequiredArgsConstructor
 public class GiftTestService {
+
+    private final GiftJdbcRepository giftJdbcRepository;
     private final GiftRepository giftRepository;
 
     private final EventRepository eventRepository;
@@ -35,15 +39,19 @@ public class GiftTestService {
     @Transactional
     public void createAllGifts() {
         List<Event> events = eventRepository.findAll();
+        List<Gift> gifts = new ArrayList<>();
         for(Event event : events) {
             Users user = event.getUsers();
             Account account = accountRepository.findAllByUsers(user).get(0);
             Address address = addressRepository.findAllByUsers(user).get(0);
-            create(event, account, address);
+            Gift gift = create(event, account, address);
+            gifts.add(gift);
         }
+
+        giftJdbcRepository.batchUpdateGifts(gifts);
     }
 
-    public void create(Event event, Account account, Address address) {
+    public Gift create(Event event, Account account, Address address) {
         generateRandomPrices();
         Random random = new Random();
         int rndGiftNames = random.nextInt(giftNames.length);
@@ -62,7 +70,9 @@ public class GiftTestService {
                 .address(address)
                 .build();
 
-        giftRepository.save(gift);
+        return gift;
+
+        //giftRepository.save(gift);
     }
 
     private void generateRandomPrices() {

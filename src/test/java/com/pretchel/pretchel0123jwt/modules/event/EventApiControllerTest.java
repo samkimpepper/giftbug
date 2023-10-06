@@ -38,6 +38,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@Transactional
 class EventApiControllerTest {
 
     @Autowired
@@ -72,24 +73,28 @@ class EventApiControllerTest {
     private MockMvc mvc;
 
 
-    @BeforeEach
-    void setup() throws ParseException {
-        userFactory.createUser("duck12@gmail.com");
-    }
-
-
-    @AfterEach
-    void clean() {
-        eventRepository.deleteAll();
-        accountRepository.deleteAll();
-        addressRepository.deleteAll();
-        userRepository.deleteAll();
-    }
+//    @BeforeEach
+//    void setup() throws ParseException {
+//        userFactory.createUser("duck12@gmail.com");
+//    }
+//
+//
+//    @AfterEach
+//    void clean() {
+//        eventRepository.deleteAll();
+//        accountRepository.deleteAll();
+//        addressRepository.deleteAll();
+//        userRepository.deleteAll();
+//    }
 
     @Test
     @WithMockCustomUser
     public void event_pagination_success() throws Exception {
+        userFactory.createUser("duck12@gmail.com");
         Users user = userRepository.findByEmail("duck12@gmail.com").orElseThrow();
+        if(user.getAccounts().isEmpty()) {
+
+        }
         addressAccountFactory.createAccount("김오리", user, true);
         addressAccountFactory.createAddress("김오리", user, true);
         generateMultipleEvent(user);
@@ -131,6 +136,7 @@ class EventApiControllerTest {
     @WithMockCustomUser
     @DisplayName("디폴트 주소나 계좌 둘 중 하나라도 설정하지 않으면 이벤트 생성 불가")
     void createEventFail() throws Exception {
+        userFactory.createUser("duck12@gmail.com");
         Users user = userRepository.findByEmail("duck12@gmail.com").orElseThrow();
         addressAccountFactory.createAccount("김오리", user, true);
 
@@ -148,6 +154,7 @@ class EventApiControllerTest {
     @WithMockCustomUser
     @DisplayName("디폹트 주소 설정해서 이벤트 생성 성공")
     void createEventSuccess() throws Exception {
+        userFactory.createUser("duck12@gmail.com");
         Users user = userRepository.findByEmail("duck12@gmail.com").orElseThrow();
         addressAccountFactory.createAccount("김오리", user, true);
         addressAccountFactory.createAddress("김오리", user, true);
@@ -236,6 +243,7 @@ class EventApiControllerTest {
     @WithMockCustomUser
     @DisplayName("이벤트 삭제(선물이 없기 때문에 성공)")
     void deleteEventSuccess() throws Exception {
+        userFactory.createUser("duck12@gmail.com");
         Users user = userRepository.findByEmail("duck12@gmail.com").orElseThrow();
         addressAccountFactory.createAccount("오리오리", user, true);
         addressAccountFactory.createAddress("오리오리", user, true);

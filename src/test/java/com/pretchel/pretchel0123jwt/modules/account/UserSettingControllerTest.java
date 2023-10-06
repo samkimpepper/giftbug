@@ -17,6 +17,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
@@ -26,6 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 @SpringBootTest
 @AutoConfigureMockMvc
+@Transactional
 public class UserSettingControllerTest {
     @Autowired
     private ObjectMapper mapper;
@@ -37,22 +43,17 @@ public class UserSettingControllerTest {
     private UserRepository userRepository;
 
     @Autowired
-    private NotificationRepository notificationRepository;
-
-    @Autowired
     private UserFactory userFactory;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    @BeforeEach
-    void setup() throws Exception {
-        userFactory.createUser("duck12@gmail.com");
-    }
 
     @Test
     @WithMockCustomUser
     void update_user_info_success() throws Exception {
+        userFactory.createUser("duck12@gmail.com");
+
         UpdateUserInfoDto dto = UpdateUserInfoDto.builder()
                 .birthday("1999-01-01")
                 .phoneNumber("010-1234-5678")
@@ -69,13 +70,16 @@ public class UserSettingControllerTest {
 
         Users user = userRepository.findByEmail("duck12@gmail.com").orElseThrow();
 
-        assertEquals(user.getBirthday().toString(), "1999-01-01");
+        LocalDate expectedDate = LocalDate.parse("1999-01-01", DateTimeFormatter.ISO_DATE);
+        assertEquals(user.getBirthday().toInstant().atZone(ZoneId.systemDefault()).toLocalDate(), expectedDate);
         assertEquals(user.getPhoneNumber(), "010-1234-5678");
     }
 
     @Test
     @WithMockCustomUser
     void update_password_success() throws Exception {
+        userFactory.createUser("duck12@gmail.com");
+
         UpdatePasswordDto dto = UpdatePasswordDto.builder()
                 .password("password")
                 .checkPassword("drakedrake12")
@@ -98,9 +102,5 @@ public class UserSettingControllerTest {
     }
 
 
-    @AfterEach
-    void clean() {
-        notificationRepository.deleteAll();
-        userRepository.deleteAll();
-    }
+
 }
