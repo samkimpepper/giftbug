@@ -6,8 +6,10 @@ import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -17,14 +19,15 @@ public class GiftJdbcRepository {
     private final JdbcTemplate jdbcTemplate;
 
     public void batchUpdateGifts(List<Gift> gifts) {
-        String sql = "INSERT INTO gift (name, price, dead_line, funded, link, story, state, event_id, account_id, address_id, id) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO gift (name, price, dead_line, funded, link, story, state, event_id, account_id, address_id, id, create_date, modified_date) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
             @Override
             public void setValues(PreparedStatement ps, int i) throws SQLException {
                 Gift gift = gifts.get(i);
                 UUID uuid = UUID.randomUUID();
+                LocalDateTime now = LocalDateTime.now();
 
                 ps.setString(1, gift.getName());
                 ps.setInt(2, gift.getPrice());
@@ -37,6 +40,8 @@ public class GiftJdbcRepository {
                 ps.setString(9, gift.getAccount().getId());
                 ps.setString(10, gift.getAddress().getId());
                 ps.setString(11, String.valueOf(uuid));
+                ps.setDate(12, Date.valueOf(now.toLocalDate()));
+                ps.setDate(13, Date.valueOf(now.toLocalDate()));
             }
 
             @Override
