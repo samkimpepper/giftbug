@@ -18,8 +18,8 @@ public class MessageJdbcRepository {
     private final JdbcTemplate jdbcTemplate;
 
     public void batchUpdateMessages(List<Message> messages) {
-        String sql = "INSERT INTO message (nickname, content, amount, payments_id, gift_id, create_date, modified_date) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO message (nickname, content, amount, payments_id, gift_id, create_date, modified_date, id) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
         jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
             @Override
@@ -35,6 +35,7 @@ public class MessageJdbcRepository {
                 ps.setString(5, message.getGift().getId());
                 ps.setDate(6, Date.valueOf(now.toLocalDate()));
                 ps.setDate(7, Date.valueOf(now.toLocalDate()));
+                ps.setString(8, uuid.toString());
 
             }
 
