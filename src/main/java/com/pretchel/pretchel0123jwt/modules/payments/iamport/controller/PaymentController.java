@@ -79,7 +79,7 @@ public class PaymentController {
 
     @PostMapping("/all")
     public ResponseDto.Empty createPaymentsPerAllGift() {
-        paymentMessageTestService.batchUpdatePaymentAndMessagePerAllGifts();
+        paymentMessageTestService.createPaymentAndMessagePerAllGifts();
         return new ResponseDto.Empty();
     }
 }
