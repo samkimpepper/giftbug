@@ -115,6 +115,18 @@ public class GiftService {
         }
     }
 
+
+    public void syncFund(Gift gift, int amount) {
+        gift = giftRepository.findByIdWithPessimisticLock(gift.getId()).orElseThrow();
+        gift.pay(amount);
+        if(gift.isGranterPrice()) {
+            gift.changeState(GiftState.success);
+            eventPublisher.publishEvent(new GiftCompletedEvent(gift, gift.getEvent().getUsers()));
+        }
+        giftRepository.saveAndFlush(gift);
+    }
+
+
     @Transactional
     public void finish(String giftId) {
         Gift gift = giftRepository.findById(giftId).orElseThrow(NotFoundException::new);

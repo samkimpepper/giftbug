@@ -9,6 +9,7 @@ import com.pretchel.pretchel0123jwt.modules.payments.iamport.repository.IamportP
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.security.authentication.ProviderManager;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +25,16 @@ public class IamportPaymentService {
     public IamportPayment createPayment(PaymentsCompleteDto dto, Users user, Gift gift) {
         IamportPayment payment = IamportPayment.complete(dto, user, gift);
         iamportPaymentRepository.save(payment);
+
+        if(payment.getIsMember())
+            eventPublisher.publishEvent(new PaymentsCompletedEvent(user, payment));
+
+        return payment;
+    }
+
+    public IamportPayment syncCreatePayment(PaymentsCompleteDto dto, Users user, Gift gift) {
+        IamportPayment payment = IamportPayment.complete(dto, user, gift);
+        iamportPaymentRepository.saveAndFlush(payment);
 
         if(payment.getIsMember())
             eventPublisher.publishEvent(new PaymentsCompletedEvent(user, payment));

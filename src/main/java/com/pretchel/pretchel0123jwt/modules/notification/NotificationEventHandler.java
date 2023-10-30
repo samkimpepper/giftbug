@@ -11,12 +11,9 @@ import org.springframework.stereotype.Component;
 public class NotificationEventHandler {
     private final NotificationService notificationService;
 
-
     @EventListener
     public void saveNotification(NotificationEvent event) {
 
         notificationService.createNotification(event.createNotification());
     }
-
-
 }

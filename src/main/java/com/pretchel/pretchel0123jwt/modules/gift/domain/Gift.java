@@ -34,6 +34,9 @@ public class Gift extends BaseTime {
     @Column(length = 36)
     private String id;
 
+    @Version
+    private Long version;
+
     @Column
     private String name;
 

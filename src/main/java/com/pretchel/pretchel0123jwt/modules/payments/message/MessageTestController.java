@@ -40,7 +40,7 @@ public class MessageTestController {
         
         iamportPaymentRepository.save(mockPayment);
 
-        messageService.createMessage(mockPayment);
+        //messageService.createMessage(mockPayment);
         return new ResponseDto.Empty();
     }
 }

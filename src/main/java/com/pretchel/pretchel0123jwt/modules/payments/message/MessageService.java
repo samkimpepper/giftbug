@@ -21,8 +21,7 @@ public class MessageService {
     private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
-    public void createMessage(IamportPayment payments) {
-        Gift gift = payments.getGift();
+    public void createMessage(IamportPayment payments, Users user, Gift gift) {
         Message message = Message.builder()
                         .nickname(payments.getBuyerName())
                         .content(payments.getMessage())
@@ -34,7 +33,7 @@ public class MessageService {
         messageRepository.save(message);
 
         // 알림 보냄
-        Users receiver = gift.getEvent().getUsers();
-        eventPublisher.publishEvent(new MessageCreatedEvent(message, gift, message.getNickname(), receiver));
+        eventPublisher.publishEvent(new MessageCreatedEvent(message, gift, message.getNickname(), user));
     }
+
 }

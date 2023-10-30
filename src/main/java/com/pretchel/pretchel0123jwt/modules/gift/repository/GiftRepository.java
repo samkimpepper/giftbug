@@ -7,12 +7,23 @@ import com.pretchel.pretchel0123jwt.modules.info.domain.Address;
 import com.pretchel.pretchel0123jwt.modules.event.domain.Event;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import javax.persistence.LockModeType;
 import java.util.List;
+import java.util.Optional;
 
 public interface GiftRepository extends JpaRepository<Gift, String> {
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("select g from Gift g where g.id = ?1")
+    Optional<Gift> findByIdWithPessimisticLock(String id);
+
+    @Lock(LockModeType.OPTIMISTIC)
+    @Query("select g from Gift g where g.id = ?1")
+    Optional<Gift> findByIdWithOptimisticLock(String id);
 
     @Query("select g from Gift g where g.event = ?1")
     List<Gift> findAllByEventId(@Param("event") Event event);

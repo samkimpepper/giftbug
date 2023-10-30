@@ -15,6 +15,7 @@ import com.pretchel.pretchel0123jwt.modules.account.domain.Authority;
 import com.pretchel.pretchel0123jwt.modules.account.domain.Users;
 import com.pretchel.pretchel0123jwt.modules.account.repository.UserRepository;
 import com.pretchel.pretchel0123jwt.modules.account.dto.user.UserResponseDto;
+import com.pretchel.pretchel0123jwt.modules.notification.event.PasswordChangedEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -28,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 
 import javax.servlet.http.HttpServletResponse;
+import java.io.FileInputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -81,7 +83,7 @@ public class UserService {
 
     @Transactional
     public LoginTokenDto login(LoginDto dto, HttpServletResponse response) {
-        userRepository.findByEmail(dto.getEmail()).orElseThrow(NotFoundException::new);
+        Users user = userRepository.findByEmail(dto.getEmail()).orElseThrow(NotFoundException::new);
 
         UsernamePasswordAuthenticationToken authenticationToken = dto.toAuthentication();
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
@@ -93,6 +95,7 @@ public class UserService {
         int cookieMaxAge = tokenInfo.getRefreshTokenExpirationTime().intValue() / 60;
         CookieUtils.addCookie(response, REFRESH_TOKEN, tokenInfo.getRefreshToken(), cookieMaxAge);
 
+        eventPublisher.publishEvent(new PasswordChangedEvent(user, user.getModifiedDate()));
         return new LoginTokenDto(tokenInfo.getAccessToken());
     }
 
