@@ -1,8 +1,8 @@
 # giftbug
 Giftbug은 선물 펀딩 웹서비스입니다. 필요없는 생일선물보다, 갖고싶은 생일선물에 펀딩을 받을 수 있습니다. 
-여기에 api 명세
 
 # 프로젝트 소개
+![아키텍처](https://github.com/samkimpepper/giftbug/assets/62634206/62495a65-03cd-4d04-902c-4e2e7e4078a0)
 
 # 기술 스택
 Spring Boot, MariaDB, Spring Data JPA, Redis, 
