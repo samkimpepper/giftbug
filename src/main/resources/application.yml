@@ -145,3 +145,18 @@ springfox:
     open-api:
       enabled: true
     enabled: true
+
+management:
+  server:
+    port: 9091
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    metrics:
+      enabled: true
+    health:
+      show-details: always
+    prometheus:
+      enabled: true

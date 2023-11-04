@@ -127,6 +127,7 @@ public class GiftService {
     }
 
 
+
     @Transactional
     public void finish(String giftId) {
         Gift gift = giftRepository.findById(giftId).orElseThrow(NotFoundException::new);

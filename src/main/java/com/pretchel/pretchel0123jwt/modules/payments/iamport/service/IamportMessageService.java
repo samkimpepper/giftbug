@@ -9,11 +9,16 @@ import com.pretchel.pretchel0123jwt.modules.payments.iamport.domain.IamportPayme
 import com.pretchel.pretchel0123jwt.modules.payments.iamport.dto.PaymentsCompleteDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.StaleStateException;
+import org.hibernate.exception.LockAcquisitionException;
+import org.springframework.dao.CannotAcquireLockException;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.RememberMeAuthenticationProvider;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.persistence.OptimisticLockException;
 
 @Service
 @RequiredArgsConstructor
@@ -34,7 +39,7 @@ public class IamportMessageService {
 
 
     @Transactional
-    public void syncCreatePaymentNMessage(PaymentsCompleteDto dto, Users user, Gift gift) {
+    public void syncCreatePaymentNMessage(PaymentsCompleteDto dto, Users user, Gift gift) throws InterruptedException {
         IamportPayment payment = iamportPaymentService.createPayment(dto, user, gift); // IamportPayment 엔티티 save
         messageService.createMessage(payment, user, gift);
         giftService.syncFund(gift, payment.getAmount());

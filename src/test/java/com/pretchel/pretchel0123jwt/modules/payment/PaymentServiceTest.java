@@ -93,9 +93,9 @@ public class PaymentServiceTest {
         Gift gift = giftRepository.findAllByEvent(event).get(0);
 
         // when
-        ExecutorService executorService = Executors.newFixedThreadPool(15);
-        CountDownLatch latch = new CountDownLatch(15);
-        for(int i = 0; i < 15; i++) {
+        ExecutorService executorService = Executors.newFixedThreadPool(10);
+        CountDownLatch latch = new CountDownLatch(30);
+        for(int i = 0; i < 30; i++) {
             Gift finalGift = gift;
             executorService.submit(() -> {
                 try {
@@ -110,7 +110,7 @@ public class PaymentServiceTest {
 
         // then
         gift = giftRepository.findAllByEvent(event).get(0);
-        assertThat(gift.getFunded(), equalTo(100000));
+        assertThat(gift.getFunded(), equalTo(300000));
     }
     @AfterEach
     public void clean() {
