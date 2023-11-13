@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -27,8 +28,8 @@ public class OpenbankingDepositService {
         openbankingDepositRepository.save(deposit);
     }
 
-    @Transactional
-    public void preSave(String bankTranId, Gift gift, Users receiver) {
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public OpenbankingDeposit preSave(String bankTranId, Gift gift, Users receiver) {
         OpenbankingDeposit deposit = OpenbankingDeposit.builder()
                 .bank_tran_id(bankTranId)
                 .amount(-1)
@@ -40,6 +41,12 @@ public class OpenbankingDepositService {
                 .build();
 
         openbankingDepositRepository.save(deposit);
+        return deposit;
+    }
+
+    @Transactional
+    public void postProcess(OpenbankingDeposit deposit, OpenbankingStatus status, OpenbankingDepositResponseDto dto) {
+        deposit.postProcess(dto, status);
     }
 
     public List<OpenbankingDeposit> findAllByStatus(OpenbankingStatus status) {

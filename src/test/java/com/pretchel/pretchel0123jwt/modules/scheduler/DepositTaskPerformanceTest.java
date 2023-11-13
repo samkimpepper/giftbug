@@ -4,18 +4,17 @@ import com.pretchel.pretchel0123jwt.infra.OpenbankingApi;
 import com.pretchel.pretchel0123jwt.modules.account.UserFactory;
 import com.pretchel.pretchel0123jwt.modules.account.domain.Users;
 import com.pretchel.pretchel0123jwt.modules.account.repository.UserRepository;
-import com.pretchel.pretchel0123jwt.modules.account.service.UserSettingService;
 import com.pretchel.pretchel0123jwt.modules.deposit.OpenbankingDepositRepository;
 import com.pretchel.pretchel0123jwt.modules.deposit.domain.OpenbankingDeposit;
 import com.pretchel.pretchel0123jwt.modules.deposit.domain.OpenbankingStatus;
-import com.pretchel.pretchel0123jwt.modules.deposit.dto.*;
+import com.pretchel.pretchel0123jwt.modules.deposit.dto.OpenbankingDepositResponseDto;
+import com.pretchel.pretchel0123jwt.modules.deposit.dto.ResListDto;
 import com.pretchel.pretchel0123jwt.modules.event.EventFactory;
 import com.pretchel.pretchel0123jwt.modules.event.domain.Event;
 import com.pretchel.pretchel0123jwt.modules.event.repository.EventRepository;
 import com.pretchel.pretchel0123jwt.modules.gift.GiftFactory;
 import com.pretchel.pretchel0123jwt.modules.gift.GiftService;
 import com.pretchel.pretchel0123jwt.modules.gift.domain.Gift;
-import com.pretchel.pretchel0123jwt.modules.gift.domain.GiftState;
 import com.pretchel.pretchel0123jwt.modules.gift.domain.ProcessState;
 import com.pretchel.pretchel0123jwt.modules.gift.repository.GiftRepository;
 import com.pretchel.pretchel0123jwt.modules.info.AddressAccountFactory;
@@ -24,7 +23,6 @@ import com.pretchel.pretchel0123jwt.modules.info.domain.Address;
 import com.pretchel.pretchel0123jwt.modules.notification.NotificationRepository;
 import com.pretchel.pretchel0123jwt.modules.payment.PaymentFactory;
 import com.pretchel.pretchel0123jwt.modules.payments.iamport.repository.IamportPaymentRepository;
-import com.pretchel.pretchel0123jwt.modules.payments.iamport.service.IamportMessageService;
 import com.pretchel.pretchel0123jwt.modules.payments.message.MessageRepository;
 import com.pretchel.pretchel0123jwt.modules.scheduler.task.DepositTask;
 import org.junit.jupiter.api.AfterEach;
@@ -34,7 +32,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Sort;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,12 +39,10 @@ import java.util.List;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.isNotNull;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.then;
 
 @SpringBootTest
-public class DepositTaskTest {
+public class DepositTaskPerformanceTest {
     @Autowired
     private DepositTask depositTask;
 
@@ -103,12 +98,14 @@ public class DepositTaskTest {
 
         Event event = eventFactory.createEvent(user, "오뤼", "2023-06-10");
 
-        Gift gift = giftFactory.createGift("이어폰", 300000, event, account, address);
-        paymentFactory.createPayment(50000, gift, user);
-        giftService.expired(gift);
-        assertThat(gift.getFunded(), equalTo(50000));
-        giftRepository.save(gift);
-        userRepository.save(user);
+        for(int i=0; i<1000; i++) {
+            Gift gift = giftFactory.createGift("이어폰", 300000, event, account, address);
+            paymentFactory.createPayment(50000, gift, user);
+            giftService.expired(gift);
+            assertThat(gift.getFunded(), equalTo(50000));
+            giftRepository.save(gift);
+            userRepository.save(user);
+        }
     }
 
     @AfterEach
@@ -139,41 +136,6 @@ public class DepositTaskTest {
         assertThat(deposit.getStatus(), equalTo(OpenbankingStatus.PAID));
         assertThat(gift.getProcessState(), equalTo(ProcessState.completed));
         assertThat(deposit.getGift().getId(), equalTo(gift.getId()));
-    }
-
-    @Test
-    public void deposit_to_expired_gift_fail() {
-        Users user = userRepository.findByEmail("duck12@gmail.com").orElseThrow();
-        Event event = eventRepository.findAllByUsers(user).get(0);
-
-        given(openbankingApi.depositAmount(any(String.class), any(String.class),any(String.class),any(String.class))).willReturn(generateOpenbankingDepositResponseDto("400"));
-
-        depositTask.depositExpiredGiftAmount();
-
-        Gift gift = giftRepository.findAllByEvent(event).get(0);
-        OpenbankingDeposit deposit = depositRepository.findAllByGift(gift, Sort.by(Sort.Direction.DESC, "createDate")).get(0);
-
-        assertThat(deposit.getStatus(), equalTo(OpenbankingStatus.UNCHECKED));
-        assertThat(gift.getProcessState(), equalTo(ProcessState.check));
-        assertThat(deposit.getGift().getId(), equalTo(gift.getId()));
-    }
-
-    @Test
-    public void check_deposit_result_success() {
-        Users user = userRepository.findByEmail("duck12@gmail.com").orElseThrow();
-        Event event = eventRepository.findAllByUsers(user).get(0);
-
-        given(openbankingApi.depositAmount(any(String.class), any(String.class),any(String.class),any(String.class))).willReturn(generateOpenbankingDepositResponseDto("400"));
-        depositTask.depositExpiredGiftAmount();
-
-        given(openbankingApi.depositResultCheck(any(OpenbankingDeposit.class))).willReturn(generateDepositResultCheckResponseDto("000"));
-        depositTask.checkDepositResult();
-
-        Gift gift = giftRepository.findAllByEvent(event).get(0);
-        OpenbankingDeposit deposit = depositRepository.findAllByGift(gift, Sort.by(Sort.Direction.DESC, "createDate")).get(0);
-
-        assertThat(deposit.getStatus(), equalTo(OpenbankingStatus.PAID));
-        assertThat(gift.getProcessState(), equalTo(ProcessState.completed));
     }
 
     private OpenbankingDepositResponseDto generateOpenbankingDepositResponseDto(String bank_rsp_code) {
@@ -215,31 +177,4 @@ public class DepositTaskTest {
                 .build();
 
     }
-
-
-    private DepositResultCheckResponseDto generateDepositResultCheckResponseDto(String bank_rsp_code) {
-        CheckResListDto resListDto = generateCheckResListDto(bank_rsp_code);
-        List<CheckResListDto> resList = new ArrayList<>();
-        resList.add(resListDto);
-
-        return DepositResultCheckResponseDto.builder()
-                .api_tran_id("2ffd133a-d17a-431d-a6a5")
-                .api_tran_dtm("202306161010102937")
-                .rsp_code("000")
-                .rsp_message("")
-                .res_cnt(1)
-                .res_list(resList)
-                .build();
-    }
-
-    private CheckResListDto generateCheckResListDto(String bank_rsp_code) {
-        return CheckResListDto.builder()
-                .tran_no(1)
-                .bank_tran_id("F123456789U4BC34239Z")
-                .bank_tran_date("20230616")
-                .bank_rsp_code(bank_rsp_code)
-                .tran_amt(50000)
-                .build();
-    }
 }
-

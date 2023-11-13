@@ -24,18 +24,14 @@ import org.springframework.transaction.support.TransactionTemplate;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
 @Slf4j
 public class DepositTask {
     private final GiftRepository giftRepository;
-    private final OpenbankingApi openbankingApi;
-
-
-    private final OpenbankingDepositService openbankingDepositService;
-
-    private final UserRepository userRepository;
 
     private final DepositTaskTransactional depositTaskTransactional;
 
@@ -45,19 +41,28 @@ public class DepositTask {
      * 400, 803, 804: 그냥 에러.
      * 822: 은행거래고유번호 중복. 다시 만들어서 해야됨;; -> 이것만 입금이체 재요청.
      * A0007: 에러.
-     * 400, 803, 804, 822, A0007일 시 OpenbankingStatus는 check로
+     * 400, 803, 804, 822, A0007일 시 OpenbankingStatus는 unchecked로
      * 그 이외는 failed로.
      * */
-
-
     @Transactional
     public void depositExpiredGiftAmount() {
         List<Gift> gifts = giftRepository.findAllByStateInAndProcessStateIn(GiftState.expired, ProcessState.none);
 
-        for(Gift gift: gifts) {
-                depositTaskTransactional.depositExpiredGiftAmountTransactional(gift);
-        }
+        List<CompletableFuture<Void>> futures = gifts.stream()
+                .map(gift -> CompletableFuture.runAsync(() -> depositTaskTransactional.depositExpiredGiftAmountTransactional(gift)))
+                .collect(Collectors.toList());
+
+        CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
     }
+
+//    @Transactional
+//    public void depositExpiredGiftAmount() {
+//        List<Gift> gifts = giftRepository.findAllByStateInAndProcessStateIn(GiftState.expired, ProcessState.none);
+//
+//        for(Gift gift: gifts) {
+//            depositTaskTransactional.depositExpiredGiftAmountTransactional(gift);
+//        }
+//    }
 
     // 로직 순서대로 설명
     /*

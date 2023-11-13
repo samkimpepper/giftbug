@@ -72,6 +72,19 @@ public class OpenbankingDeposit extends BaseTime {
                 .build();
     }
 
+    public void postProcess(OpenbankingDepositResponseDto dto, OpenbankingStatus status) {
+        ResListDto resList = dto.getRes_list().get(0);
+
+        int amount = Integer.parseInt(resList.getTran_amt());
+        String tranDTime = dto.getApi_tran_dtm();
+        String tranNo = resList.getTran_no();
+
+        this.amount = amount;
+        this.tran_dtime = tranDTime;
+        this.tran_no = tranNo;
+        this.status = status;
+    }
+
     public void success() {
         status = OpenbankingStatus.PAID;
     }

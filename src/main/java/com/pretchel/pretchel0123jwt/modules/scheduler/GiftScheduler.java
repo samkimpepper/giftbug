@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class GiftSchedular {
+public class GiftScheduler {
     private final DepositTask depositTask;
     private final FindTask findTask;
     private final MoveTask moveTask;

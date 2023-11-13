@@ -12,20 +12,25 @@ import com.pretchel.pretchel0123jwt.modules.gift.repository.GiftRepository;
 import com.pretchel.pretchel0123jwt.modules.info.domain.Account;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.Random;
 
 @Component
 @RequiredArgsConstructor
 @Slf4j
 public class DepositTaskTransactional {
+    @Value("${openbanking.deposit.bank-tran-id}")
+    private String bankTranId;
+    private static final Random RANDOM = new Random();
+
     private final GiftRepository giftRepository;
     private final OpenbankingApi openbankingApi;
-
-
     private final OpenbankingDepositService openbankingDepositService;
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -36,6 +41,15 @@ public class DepositTaskTransactional {
         // Account
         Account receiverAccount = receiver.getDefaultAccount();
 
+        // 사전 저장
+        String newBankTranId = bankTranId;
+        newBankTranId = newBankTranId.concat(generateRandomString());
+        OpenbankingDeposit deposit = openbankingDepositService.preSave(newBankTranId, gift, receiver);
+        if (deposit == null) {
+            // preSave()가 실패했으므로 종료
+            return;
+        }
+        
         // 입금이체 실행
         OpenbankingDepositResponseDto response = openbankingApi.depositAmount(String.valueOf(gift.getFunded()), receiverAccount.getName(), receiverAccount.getBankCode(), receiverAccount.getAccountNum());
 
@@ -48,18 +62,65 @@ public class DepositTaskTransactional {
         log.info("오픈뱅킹 입금이체 응답 메세지: " + rspMsg);
 
         if(!response.getRes_list().isEmpty() && bankRspCode.equals("000")) {
-            openbankingDepositService.save(OpenbankingStatus.PAID, response, gift, receiver);
+            openbankingDepositService.postProcess(deposit, OpenbankingStatus.PAID, response);
             gift.completeProcess();
             return;
         }
         if(apiRspCode.equals("A0007") ||bankRspCode.equals("400") || bankRspCode.equals("803")|| bankRspCode.equals("804") || bankRspCode.equals("822")){
-                openbankingDepositService.save(OpenbankingStatus.UNCHECKED, response, gift, receiver);
+                openbankingDepositService.postProcess(deposit, OpenbankingStatus.UNCHECKED, response);
                 gift.shouldCheckProcess();
                 return;
         }
 
-        openbankingDepositService.save(OpenbankingStatus.FAILED, response, gift, receiver);
+        openbankingDepositService.postProcess(deposit, OpenbankingStatus.FAILED, response);
     }
+
+    private String generateRandomString() {
+        int len = 9;
+        String alpha = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        int alphaLen = alpha.length();
+
+        StringBuffer code = new StringBuffer();
+        for(int i = 0; i < len; i++) {
+            code.append(alpha.charAt(RANDOM.nextInt(alphaLen)));
+        }
+        // ThreadLocalRandom.current().nextInt();
+
+        return code.toString();
+    }
+
+//    @Transactional(propagation = Propagation.REQUIRES_NEW)
+//    public void depositExpiredGiftAmountTransactional(Gift gift) {
+//        // User
+//        Users receiver = gift.getEvent().getUsers();
+//
+//        // Account
+//        Account receiverAccount = receiver.getDefaultAccount();
+//
+//        // 입금이체 실행
+//        OpenbankingDepositResponseDto response = openbankingApi.depositAmount(String.valueOf(gift.getFunded()), receiverAccount.getName(), receiverAccount.getBankCode(), receiverAccount.getAccountNum());
+//
+//        // api 응답 코드와 은행 응답 코드 두 개가 있음.
+//        String apiRspCode = response.getRsp_code();
+//        String bankRspCode = response.getRes_list().get(0).getBank_rsp_code();
+//        String rspMsg = response.getRsp_message();
+//        log.info("오픈뱅킹 입금이체 API 응답 코드: " + apiRspCode);
+//        log.info("오픈뱅킹 입금이체 참가은행 응답 코드: " + bankRspCode);
+//        log.info("오픈뱅킹 입금이체 응답 메세지: " + rspMsg);
+//
+//        if(!response.getRes_list().isEmpty() && bankRspCode.equals("000")) {
+//            openbankingDepositService.save(OpenbankingStatus.PAID, response, gift, receiver);
+//            gift.completeProcess();
+//            return;
+//        }
+//        if(apiRspCode.equals("A0007") ||bankRspCode.equals("400") || bankRspCode.equals("803")|| bankRspCode.equals("804") || bankRspCode.equals("822")){
+//            openbankingDepositService.save(OpenbankingStatus.UNCHECKED, response, gift, receiver);
+//            gift.shouldCheckProcess();
+//            return;
+//        }
+//
+//        openbankingDepositService.save(OpenbankingStatus.FAILED, response, gift, receiver);
+//    }
 
     @Transactional
     public void checkDepositResult(Gift gift) {
