@@ -87,6 +87,7 @@ public class Gift extends BaseTime {
         this.state = state;
     }
 
+    public void changeProcessState(ProcessState state) { this.processState = state; }
 
     public void completeProcess() {
         processState = ProcessState.completed;

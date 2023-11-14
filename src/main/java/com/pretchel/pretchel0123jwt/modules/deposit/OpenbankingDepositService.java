@@ -44,9 +44,9 @@ public class OpenbankingDepositService {
         return deposit;
     }
 
-    @Transactional
     public void postProcess(OpenbankingDeposit deposit, OpenbankingStatus status, OpenbankingDepositResponseDto dto) {
         deposit.postProcess(dto, status);
+        openbankingDepositRepository.save(deposit);
     }
 
     public List<OpenbankingDeposit> findAllByStatus(OpenbankingStatus status) {

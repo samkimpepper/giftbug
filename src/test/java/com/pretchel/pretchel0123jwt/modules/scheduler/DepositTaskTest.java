@@ -133,11 +133,13 @@ public class DepositTaskTest {
 
         depositTask.depositExpiredGiftAmount();
 
-        OpenbankingDeposit deposit = depositRepository.findAllByGift(gift, Sort.by(Sort.Direction.DESC, "createDate")).get(0);
         gift = giftRepository.findById(gift.getId()).orElseThrow();
+        OpenbankingDeposit deposit = depositRepository.findAllByGift(gift, Sort.by(Sort.Direction.DESC, "createDate")).get(0);
 
-        assertThat(deposit.getStatus(), equalTo(OpenbankingStatus.PAID));
         assertThat(gift.getProcessState(), equalTo(ProcessState.completed));
+        assertThat(deposit.getAmount(), equalTo(50000));
+        assertThat(deposit.getStatus(), equalTo(OpenbankingStatus.PAID));
+
         assertThat(deposit.getGift().getId(), equalTo(gift.getId()));
     }
 

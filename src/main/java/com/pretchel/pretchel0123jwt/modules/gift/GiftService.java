@@ -3,6 +3,7 @@ package com.pretchel.pretchel0123jwt.modules.gift;
 import com.pretchel.pretchel0123jwt.global.exception.NotFoundException;
 import com.pretchel.pretchel0123jwt.modules.gift.domain.Gift;
 import com.pretchel.pretchel0123jwt.modules.gift.domain.GiftState;
+import com.pretchel.pretchel0123jwt.modules.gift.domain.ProcessState;
 import com.pretchel.pretchel0123jwt.modules.gift.dto.GiftDetailDto;
 import com.pretchel.pretchel0123jwt.modules.gift.repository.GiftQdslRepository;
 import com.pretchel.pretchel0123jwt.modules.gift.repository.GiftRepository;
@@ -107,7 +108,6 @@ public class GiftService {
 
     @Transactional
     public void fund(Gift gift, int amount) {
-        //gift = giftRepository.findById(gift.getId()).orElseThrow(NotFoundException::new);
         gift.pay(amount);
         if(gift.isGranterPrice()) {
             gift.changeState(GiftState.success);
@@ -126,7 +126,10 @@ public class GiftService {
         giftRepository.saveAndFlush(gift);
     }
 
-
+    public void setProcessState(Gift gift, ProcessState state) {
+        gift.changeProcessState(state);
+        giftRepository.save(gift);
+    }
 
     @Transactional
     public void finish(String giftId) {

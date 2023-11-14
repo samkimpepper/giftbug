@@ -44,9 +44,8 @@ public class DepositTask {
      * 400, 803, 804, 822, A0007일 시 OpenbankingStatus는 unchecked로
      * 그 이외는 failed로.
      * */
-    @Transactional
     public void depositExpiredGiftAmount() {
-        List<Gift> gifts = giftRepository.findAllByStateInAndProcessStateIn(GiftState.expired, ProcessState.none);
+        List<Gift> gifts = giftRepository.findExpiredGiftFetchJoin(GiftState.expired, ProcessState.none);
 
         List<CompletableFuture<Void>> futures = gifts.stream()
                 .map(gift -> CompletableFuture.runAsync(() -> depositTaskTransactional.depositExpiredGiftAmountTransactional(gift)))

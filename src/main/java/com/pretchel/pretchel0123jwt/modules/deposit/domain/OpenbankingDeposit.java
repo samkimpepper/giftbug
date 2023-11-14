@@ -83,6 +83,7 @@ public class OpenbankingDeposit extends BaseTime {
         this.tran_dtime = tranDTime;
         this.tran_no = tranNo;
         this.status = status;
+
     }
 
     public void success() {
