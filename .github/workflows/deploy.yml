@@ -41,6 +41,9 @@ jobs:
     # (3) Gradle build (Test 제외)
     - name: Build with Gradle
       run: ./gradlew build -x test
+      
+    - name: Install Redis
+      run: sudo apt-get update && sudo apt-get install -y redis-server
 
     - name: Start Redis Server
       run: redis-server --daemonize yes
