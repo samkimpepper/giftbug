@@ -1,0 +1,144 @@
+
+spring:
+  profiles:
+    include: redis
+  datasource:
+    url: jdbc:h2:mem:test
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+  jpa:
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate:
+        format_sql: true
+
+    # defer-datasource-initialization: true
+  #  sql:
+  #    init:
+  #      mode: always
+  thymeleaf:
+    cache: false
+  mvc:
+    hiddenmethod:
+      filter:
+        enabled: true
+    pathmatch:
+      matching-strategy: ant_path_matcher
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: 508669043384-ae54jj160edn1i6r2m27h1avfhn23m08.apps.googleusercontent.com
+            client-secret: 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
+            redirect-uri: "{baseUrl}/oauth2/callback/google"
+            scope:
+              - email
+              - profile
+          kakao:
+            client-id: ac101720e7bee0afcdaff13bc66a4b34
+            redirect-uri: "{baseUrl}/oauth2/callback/kakao"
+            authorization-grant-type: authorization_code
+            client-authentication-method: POST
+            scope: account_email
+            client-name: kakao
+        provider:
+          kakao:
+            authorization_uri: https://kauth.kakao.com/oauth/authorize
+            token_uri: https://kauth.kakao.com/oauth/token
+            user-info-uri: https://kapi.kakao.com/v2/user/me
+            user_name_attribute: id
+  redis:
+    host: localhost
+    port: 6379
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: vegielcl@gmail.com
+    password: nicuczsahxenmvgj
+    properties:
+      mail:
+        smtp:
+          starttls:
+            enable: true
+            required: true
+          auth: true
+          connectiontimeout: 5000
+          timeout: 5000
+          writetimeout: 5000
+
+jwt:
+  secret: 1249F49GFDJ345NGJK3458SXJ454321252VXAL10S752993RFV2AlDD2
+
+server:
+  servlet:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+
+
+
+
+openbanking:
+  client-id: 42e7f7cb-0754-40fe-af3c-93e140fe7af5
+  client-secret: 5335063d-78d8-41a1-b246-bc91be43b435
+  grant-type: client_credentials
+  redirect-uri: http://localhost:8080/oauth2/openbanking/redirect
+  response-type: code
+  scope: oob
+  state: b80BLsfigm9OokPTjy03elbJqRHOfGSY
+  auth-type: 0
+  code-request-url: https://testapi.openbanking.or.kr/oauth/2.0/authorize
+  token-request-url: https://testapi.openbanking.or.kr/oauth/2.0/token
+  deposit:
+    cntr-account-num: 1002211600002
+    bank-tran-id: M202200255U
+    bank-code-std: '020'
+    account-holder-name: '이채림'
+
+
+
+cloud:
+  aws:
+    credentials:
+      accessKey: AKIA6LGEKMXDY6DDVPTG
+      secretKey: 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
+    s3:
+      bucket: turi-bucket
+    region:
+      static: ap-northeast-2
+    stack:
+      auto: false
+
+iamport:
+  key: '0713949642152998'
+  secret: 4e6d503ac4e0c8ac8095420d7dcb5ebd82f3c2e106551f600fca3f1ca7d4aab9b31da2cf364d6603
+
+springfox:
+  documentation:
+    swagger:
+      v2:
+        enabled: true
+    swagger-ui:
+      enabled: true
+    open-api:
+      enabled: true
+    enabled: true
+
+management:
+  server:
+    port: 9091
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    metrics:
+      enabled: true
+    health:
+      show-details: always
+    prometheus:
+      enabled: true

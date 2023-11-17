@@ -1,5 +1,6 @@
 package com.pretchel.pretchel0123jwt.modules.scheduler;
 
+import com.pretchel.pretchel0123jwt.TestCleanup;
 import com.pretchel.pretchel0123jwt.infra.OpenbankingApi;
 import com.pretchel.pretchel0123jwt.modules.account.UserFactory;
 import com.pretchel.pretchel0123jwt.modules.account.domain.Users;
@@ -34,6 +35,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Sort;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
@@ -47,6 +49,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
 @SpringBootTest
+@TestCleanup
 public class DepositTaskTest {
     @Autowired
     private DepositTask depositTask;
@@ -93,6 +96,7 @@ public class DepositTaskTest {
     @Autowired
     private IamportPaymentRepository paymentRepository;
 
+
     @BeforeEach
     public void setup() throws Exception {
         userFactory.createUser("duck12@gmail.com");
@@ -111,17 +115,17 @@ public class DepositTaskTest {
         userRepository.save(user);
     }
 
-    @AfterEach
-    public void clean() {
-        depositRepository.deleteAll();
-        messageRepository.deleteAll();
-        paymentRepository.deleteAll();
-        giftRepository.deleteAll();
-        eventRepository.deleteAll();
-        addressAccountFactory.deleteAll();
-        notificationRepository.deleteAll();
-        userRepository.deleteAll();
-    }
+//    @AfterEach
+//    public void clean() {
+//        depositRepository.deleteAll();
+//        messageRepository.deleteAll();
+//        paymentRepository.deleteAll();
+//        giftRepository.deleteAll();
+//        eventRepository.deleteAll();
+//        addressAccountFactory.deleteAll();
+//        notificationRepository.deleteAll();
+//        userRepository.deleteAll();
+//    }
 
     @Test
     public void deposit_to_expired_gift_success() {
