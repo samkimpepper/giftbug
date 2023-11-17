@@ -7,12 +7,12 @@ spring:
       connection-timeout: 20000
       maximum-pool-size: 20
     driver-class-name: org.mariadb.jdbc.Driver
-    url: jdbc:mariadb://127.0.0.1:3306/giftbug?serverTimezone=UT
+    #url: jdbc:mariadb://127.0.0.1:3306/giftbug?serverTimezone=UT
 
-    #url: jdbc:mariadb://giftbug-database.c2wqidr8m9u0.ap-northeast-2.rds.amazonaws.com:3306/giftbug
+    url: jdbc:mariadb://giftbug-database.c2wqidr8m9u0.ap-northeast-2.rds.amazonaws.com:3306/giftbug
     username: root
-    password: 1234
-    #password: won297712
+    #password: 1234
+    password: won297712
   jpa:
     open-in-view: true
     hibernate:
