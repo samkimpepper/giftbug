@@ -147,8 +147,8 @@ springfox:
     enabled: true
 
 management:
-  server:
-    port: 9091
+  # server:
+  #   port: 9091
   endpoints:
     web:
       exposure:
