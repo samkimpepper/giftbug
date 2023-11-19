@@ -106,13 +106,14 @@ public class GiftService {
         }
     }
 
-    @Transactional
+
     public void fund(Gift gift, int amount) {
         gift.pay(amount);
         if(gift.isGranterPrice()) {
             gift.changeState(GiftState.success);
             eventPublisher.publishEvent(new GiftCompletedEvent(gift, gift.getEvent().getUsers()));
         }
+        giftRepository.save(gift);
     }
 
 

@@ -22,6 +22,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -39,29 +41,48 @@ public class PaymentMessageTestService {
 
     private int[] prices = {5000, 10000, 15000, 20000, 25000, 30000};
 
-
-    @Transactional
     public void batchUpdatePaymentAndMessagePerAllGifts() {
         Random random = new Random();
         List<Gift> gifts = giftRepository.findAll();
-        List<IamportPayment> payments = new ArrayList<>();
-
-        for(Gift gift : gifts) {
-            int createCount = random.nextInt(10);
-            for(int i=0; i<createCount; i++) {
-                payments.add(generatePayment(gift));
-            }
-        }
+        List<IamportPayment> payments = gifts.stream()
+                        .flatMap(gift -> {
+                            int createCount = random.nextInt(10);
+                            return Stream.generate(() -> generatePayment(gift)).limit(createCount);
+                        })
+                        .collect(Collectors.toList());
         paymentJdbcRepository.batchUpdatePayments(payments);
 
-        List<Message> messages = new ArrayList<>();
-        for(IamportPayment payment : payments) {
-            Gift gift = payment.getGift();
-            messages.add(generateMessage(gift, payment));
-            giftService.fund(gift, payment.getAmount());
-        }
+        List<Message> messages = payments.stream()
+                        .map(payment -> {
+                            Gift gift = payment.getGift();
+                            giftService.fund(gift, payment.getAmount());
+                            return generateMessage(gift, payment);
+                        })
+                        .collect(Collectors.toList());
         messageJdbcRepository.batchUpdateMessages(messages);
     }
+
+//    public void batchUpdatePaymentAndMessagePerAllGifts() {
+//        Random random = new Random();
+//        List<Gift> gifts = giftRepository.findAll();
+//        List<IamportPayment> payments = new ArrayList<>();
+//
+//        for(Gift gift : gifts) {
+//            int createCount = random.nextInt(10);
+//            for(int i=0; i<createCount; i++) {
+//                payments.add(generatePayment(gift));
+//            }
+//        }
+//        paymentJdbcRepository.batchUpdatePayments(payments);
+//
+//        List<Message> messages = new ArrayList<>();
+//        for(IamportPayment payment : payments) {
+//            Gift gift = payment.getGift();
+//            messages.add(generateMessage(gift, payment));
+//            giftService.fund(gift, payment.getAmount());
+//        }
+//        messageJdbcRepository.batchUpdateMessages(messages);
+//    }
 
     private IamportPayment generatePayment(Gift gift) {
         Random random = new Random();
