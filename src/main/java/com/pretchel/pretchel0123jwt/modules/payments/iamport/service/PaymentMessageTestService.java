@@ -18,6 +18,8 @@ import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -37,6 +39,9 @@ public class PaymentMessageTestService {
     private final IamportPaymentRepository paymentRepository;
     private final MessageRepository messageRepository;
 
+    @PersistenceContext
+    private EntityManager entityManager;
+
     private final ApplicationEventPublisher eventPublisher;
 
     private int[] prices = {5000, 10000, 15000, 20000, 25000, 30000};
@@ -54,6 +59,8 @@ public class PaymentMessageTestService {
 
         List<Message> messages = payments.stream()
                         .map(payment -> {
+                            entityManager.persist(payment);
+
                             Gift gift = payment.getGift();
                             giftService.fund(gift, payment.getAmount());
                             return generateMessage(gift, payment);
