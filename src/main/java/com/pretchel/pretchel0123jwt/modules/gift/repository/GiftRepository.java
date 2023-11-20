@@ -31,6 +31,9 @@ public interface GiftRepository extends JpaRepository<Gift, String> {
     @Query("SELECT g FROM Gift g JOIN FETCH g.event e JOIN FETCH e.users u JOIN FETCH u.accounts WHERE g.state IN (:state) AND g.processState IN (:processState)")
     List<Gift> findExpiredGiftFetchJoin(@Param("state") GiftState state, @Param("processState") ProcessState processState);
 
+    @Query("SELECT DISTINCT g FROM Gift g JOIN FETCH g.event e JOIN FETCH e.users")
+    List<Gift> findAllFetchjoin();
+
     List<Gift> findAllByEvent(Event event);
 
     @Query("select g from Gift g where g.state in (:giftState)")

@@ -13,6 +13,7 @@ import com.pretchel.pretchel0123jwt.modules.payments.message.Message;
 import com.pretchel.pretchel0123jwt.modules.payments.message.MessageJdbcRepository;
 import com.pretchel.pretchel0123jwt.modules.payments.message.MessageRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
@@ -29,6 +30,7 @@ import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class PaymentMessageTestService {
     private final PaymentJdbcRepository paymentJdbcRepository;
 
@@ -48,14 +50,19 @@ public class PaymentMessageTestService {
 
     public void batchUpdatePaymentAndMessagePerAllGifts() {
         Random random = new Random();
-        List<Gift> gifts = giftRepository.findAll();
+        List<Gift> gifts = giftRepository.findAllFetchjoin();
         List<IamportPayment> payments = gifts.stream()
                         .flatMap(gift -> {
                             int createCount = random.nextInt(10);
                             return Stream.generate(() -> generatePayment(gift)).limit(createCount);
                         })
                         .collect(Collectors.toList());
-        paymentJdbcRepository.batchUpdatePayments(payments);
+        try {
+            paymentJdbcRepository.batchUpdatePayments(payments);
+        } catch(Exception ex) {
+            log.error("payment batch update 실패");
+            return;
+        }
 
         List<Message> messages = payments.stream()
                         .map(payment -> {
