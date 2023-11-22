@@ -28,7 +28,7 @@ public class GiftQdslRepository {
     public List<Gift> findByDeadLineFetchJoin() {
         return jpaQueryFactory.selectFrom(gift)
                 .join(gift.event, event).fetchJoin()
-                .join(event.users, event.users).fetchJoin()
+                .join(event.users).fetchJoin()
                 .where(Expressions.currentDate().after(gift.deadLine)).fetch();
     }
 
