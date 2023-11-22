@@ -1,5 +1,6 @@
 package com.pretchel.pretchel0123jwt.modules.scheduler;
 
+import com.pretchel.pretchel0123jwt.TestCleanup;
 import com.pretchel.pretchel0123jwt.modules.account.UserFactory;
 import com.pretchel.pretchel0123jwt.modules.account.domain.Users;
 import com.pretchel.pretchel0123jwt.modules.account.repository.UserRepository;
@@ -13,6 +14,8 @@ import com.pretchel.pretchel0123jwt.modules.gift.GiftFactory;
 import com.pretchel.pretchel0123jwt.modules.gift.GiftService;
 import com.pretchel.pretchel0123jwt.modules.gift.domain.CompletedGift;
 import com.pretchel.pretchel0123jwt.modules.gift.domain.Gift;
+import com.pretchel.pretchel0123jwt.modules.gift.domain.GiftState;
+import com.pretchel.pretchel0123jwt.modules.gift.domain.ProcessState;
 import com.pretchel.pretchel0123jwt.modules.gift.repository.CompletedGiftRepository;
 import com.pretchel.pretchel0123jwt.modules.gift.repository.GiftRepository;
 import com.pretchel.pretchel0123jwt.modules.info.AddressAccountFactory;
@@ -37,6 +40,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
 @SpringBootTest
+@TestCleanup
 public class MoveTaskTest {
     @Autowired
     private MoveTask moveTask;
@@ -66,25 +70,10 @@ public class MoveTaskTest {
     private CompletedGiftRepository completedGiftRepository;
 
     @Autowired
-    private NotificationRepository notificationRepository;
-
-    @Autowired
-    private GiftService giftService;
-
-    @Autowired
     private OpenbankingDepositRepository depositRepository;
 
     @Autowired
-    private MessageRepository messageRepository;
-
-    @Autowired
     private IamportPaymentRepository paymentRepository;
-
-    @Autowired
-    private GiftRepository giftRepository;
-
-    @Autowired
-    private EventRepository eventRepository;
 
     /*
     * User, Address, Account, Event, Gift, Payment 만들고 Deposit도 만들고
@@ -104,31 +93,15 @@ public class MoveTaskTest {
         // TODO: 오늘날짜로 설정 어떻게 하지
         Event event = eventFactory.createEvent(receiver, "오뤼", "2023-06-20");
 
-
         // success gift, 그러나 ProcessState가 none임
         Gift gift = giftFactory.createGift("이어폰", 300000, event, account, address);
-        paymentFactory.createPayment(300000, gift, buyer);
-        giftRepository.save(gift);
+        paymentFactory.syncCreatePayment(300000, gift, buyer);
 
         // expired gift, ProcessState completed
         gift = giftFactory.createGift("키보드", 250000, event, account, address);
-        paymentFactory.createPayment(30000, gift, buyer);
-        giftService.expired(gift); // 세부사항 결합?
+        paymentFactory.syncCreatePayment(30000, gift, buyer);
         depositFactory.createDeposit(OpenbankingStatus.PAID, 30000, gift, receiver);
-        giftRepository.save(gift);
-    }
 
-    @AfterEach
-    public void clean() {
-        depositRepository.deleteAll();
-        messageRepository.deleteAll();
-        paymentRepository.deleteAll();
-        giftRepository.deleteAll();
-        completedGiftRepository.deleteAll();
-        eventRepository.deleteAll();
-        addressAccountFactory.deleteAll();
-        notificationRepository.deleteAll();
-        userRepository.deleteAll();
     }
 
     @Test

@@ -26,7 +26,6 @@ public class PaymentFactory {
     }
 
     public void syncCreatePayment(int amount, Gift gift, Users buyer) {
-        //gift = giftRepository.findByIdWithOptimisticLock(gift.getId()).orElseThrow();
         try{
             iamportMessageService.syncCreatePaymentNMessage(generatePaymentsCompleteDto(amount, gift, buyer), buyer, gift);
 

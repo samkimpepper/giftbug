@@ -44,7 +44,7 @@ public class PaymentController {
     }
 
     @PostMapping("/complete")
-    public ResponseDto.Empty complete(@RequestBody PaymentsCompleteDto dto) {
+    public ResponseDto.Empty complete(@RequestBody PaymentsCompleteDto dto) throws InterruptedException {
 
         iamportPaymentApi.checkPaymentResult(dto.getImpUid(), dto.getAmount());
 
@@ -55,7 +55,7 @@ public class PaymentController {
         }
 
         Gift gift = giftRepository.findById(dto.getGiftId()).orElseThrow(NotFoundException::new);
-        iamportMessageService.createPaymentNMessage(dto, user, gift);
+        iamportMessageService.syncCreatePaymentNMessage(dto, user, gift);
         return new ResponseDto.Empty();
     }
 

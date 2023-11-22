@@ -5,7 +5,9 @@ import com.pretchel.pretchel0123jwt.modules.deposit.OpenbankingDepositService;
 import com.pretchel.pretchel0123jwt.modules.deposit.domain.OpenbankingStatus;
 import com.pretchel.pretchel0123jwt.modules.deposit.dto.OpenbankingDepositResponseDto;
 import com.pretchel.pretchel0123jwt.modules.deposit.dto.ResListDto;
+import com.pretchel.pretchel0123jwt.modules.gift.GiftService;
 import com.pretchel.pretchel0123jwt.modules.gift.domain.Gift;
+import com.pretchel.pretchel0123jwt.modules.gift.domain.ProcessState;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,11 +20,15 @@ public class DepositFactory {
     @Autowired
     private OpenbankingDepositService depositService;
 
+    @Autowired
+    private GiftService giftService;
+
     @Transactional
     public void createDeposit(OpenbankingStatus status, int amount, Gift gift, Users receiver) {
         OpenbankingDepositResponseDto dto = generateOpenbankingDepositResponseDto("A0000", amount);
         depositService.save(status, dto, gift, receiver);
-        gift.completeProcess();
+        giftService.syncSetProcessState(gift, ProcessState.completed);
+        System.out.println("gift state: " + gift.getProcessState());
     }
     private OpenbankingDepositResponseDto generateOpenbankingDepositResponseDto(String bank_rsp_code, int amount) {
         ResListDto resList = generateResListDto(bank_rsp_code, amount);

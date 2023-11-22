@@ -27,14 +27,23 @@ public class FindTask {
 
     private final ApplicationEventPublisher eventPublisher;
 
+//    @Transactional
+//    public void findExpiredGifts() {
+//        List<Gift> gifts = giftQdslRepository.findByDeadLine();
+//
+//        for(Gift gift: gifts) {
+//            giftService.expired(gift);
+//            eventPublisher.publishEvent(new GiftExpiredEvent(gift, gift.getEvent().getUsers()));
+//        }
+//    }
+
     @Transactional
     public void findExpiredGifts() {
-        List<Gift> gifts = giftQdslRepository.findByDeadLine();
-
-        for(Gift gift: gifts) {
-            giftService.expired(gift);
-            eventPublisher.publishEvent(new GiftExpiredEvent(gift, gift.getEvent().getUsers()));
-        }
+        giftQdslRepository.findByDeadLine()
+                .forEach(gift -> {
+                    giftService.expired(gift);
+                    eventPublisher.publishEvent(new GiftExpiredEvent(gift, gift.getEvent().getUsers()));
+                });
     }
 
 }

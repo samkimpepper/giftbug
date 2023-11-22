@@ -1,15 +1,18 @@
 package com.pretchel.pretchel0123jwt.modules.payment;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.pretchel.pretchel0123jwt.TestCleanup;
 import com.pretchel.pretchel0123jwt.config.WithMockCustomUser;
 import com.pretchel.pretchel0123jwt.modules.account.UserFactory;
 import com.pretchel.pretchel0123jwt.modules.account.domain.Users;
 import com.pretchel.pretchel0123jwt.modules.account.repository.UserRepository;
 import com.pretchel.pretchel0123jwt.modules.event.EventFactory;
 import com.pretchel.pretchel0123jwt.modules.event.domain.Event;
+import com.pretchel.pretchel0123jwt.modules.event.domain.QEvent;
 import com.pretchel.pretchel0123jwt.modules.event.repository.EventRepository;
 import com.pretchel.pretchel0123jwt.modules.gift.GiftFactory;
 import com.pretchel.pretchel0123jwt.modules.gift.domain.Gift;
+import com.pretchel.pretchel0123jwt.modules.gift.domain.QGift;
 import com.pretchel.pretchel0123jwt.modules.gift.repository.GiftRepository;
 import com.pretchel.pretchel0123jwt.modules.info.AddressAccountFactory;
 import com.pretchel.pretchel0123jwt.modules.info.domain.Account;
@@ -17,12 +20,15 @@ import com.pretchel.pretchel0123jwt.modules.info.domain.Address;
 import com.pretchel.pretchel0123jwt.modules.notification.NotificationRepository;
 import com.pretchel.pretchel0123jwt.modules.notification.domain.Notification;
 import com.pretchel.pretchel0123jwt.modules.notification.domain.NotificationType;
+import com.pretchel.pretchel0123jwt.modules.notification.domain.QNotification;
 import com.pretchel.pretchel0123jwt.modules.payments.iamport.IamportPaymentApi;
 import com.pretchel.pretchel0123jwt.modules.payments.iamport.domain.IamportPayment;
 import com.pretchel.pretchel0123jwt.modules.payments.iamport.dto.PaymentsCompleteDto;
 import com.pretchel.pretchel0123jwt.modules.payments.iamport.repository.IamportPaymentRepository;
 import com.pretchel.pretchel0123jwt.modules.payments.message.Message;
 import com.pretchel.pretchel0123jwt.modules.payments.message.MessageRepository;
+import com.pretchel.pretchel0123jwt.modules.payments.message.QMessage;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.json.JSONObject;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -49,7 +55,11 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@TestCleanup
 public class PaymentControllerTest {
+    @Autowired
+    private JPAQueryFactory queryFactory;
+
     @Autowired
     private MockMvc mvc;
 
@@ -75,20 +85,7 @@ public class PaymentControllerTest {
     private UserRepository userRepository;
 
     @Autowired
-    private GiftRepository giftRepository;
-
-    @Autowired
-    private EventRepository eventRepository;
-
-    @Autowired
     private IamportPaymentRepository paymentRepository;
-
-    @Autowired
-    private MessageRepository messageRepository;
-
-    @Autowired
-    private NotificationRepository notificationRepository;
-
 
     @BeforeEach
     public void setup() throws Exception {
@@ -118,8 +115,9 @@ public class PaymentControllerTest {
 
         Users buyer = userRepository.findByEmail("duck12@gmail.com").orElseThrow();
         Users receiver = userRepository.findByEmail("chick12@gmail.com").orElseThrow();
-        Event event = eventRepository.findAllByUsers(receiver).get(0);
-        Gift gift = giftRepository.findAllByEvent(event).get(0);
+
+        Event event = queryFactory.selectFrom(QEvent.event).where(QEvent.event.users.eq(receiver)).fetch().get(0);
+        Gift gift = queryFactory.selectFrom(QGift.gift).where(QGift.gift.event.eq(event)).fetch().get(0);
         PaymentsCompleteDto dto = generatePaymentsCompleteDto(merchantUid, 5000, gift);
         String content = mapper.writeValueAsString(dto);
 
@@ -133,10 +131,10 @@ public class PaymentControllerTest {
                 .andExpect(status().isOk());
 
         IamportPayment payment = paymentRepository.findAllByGift(gift).get(0);
-        Message message = messageRepository.findByPayments(payment);
-        gift = giftRepository.findById(gift.getId()).orElseThrow();
-        Notification paymentCompleteNotification = notificationRepository.findAllByListener(buyer).get(0);
-        Notification messageReceivedNotification = notificationRepository.findAllByListener(receiver).get(0);
+        Message message = queryFactory.selectFrom(QMessage.message).where(QMessage.message.payments.eq(payment)).fetchFirst();
+        gift = queryFactory.selectFrom(QGift.gift).where(QGift.gift.eq(gift)).fetchOne();
+        Notification paymentCompleteNotification = queryFactory.selectFrom(QNotification.notification).where(QNotification.notification.listener.eq(buyer)).fetchFirst();
+        Notification messageReceivedNotification = queryFactory.selectFrom(QNotification.notification).where(QNotification.notification.listener.eq(receiver)).fetchFirst();
 
         assertThat(payment.getMerchant_uid(), equalTo(merchantUid));
         assertThat(payment.getMessage(), equalTo(message.getContent()));
@@ -144,17 +142,6 @@ public class PaymentControllerTest {
         assertThat(gift.getFunded(), equalTo(5000));
         assertThat(paymentCompleteNotification.getNotificationType(), equalTo(NotificationType.PAYMENTS_COMPLETED));
         assertThat(messageReceivedNotification.getNotificationType(), equalTo(NotificationType.MESSAGE_RECEIVED));
-    }
-
-    @AfterEach
-    public void clean() {
-        messageRepository.deleteAll();
-        paymentRepository.deleteAll();
-        giftRepository.deleteAll();
-        eventRepository.deleteAll();
-        addressAccountFactory.deleteAll();
-        notificationRepository.deleteAll();
-        userRepository.deleteAll();
     }
 
     private PaymentsCompleteDto generatePaymentsCompleteDto(String merchantUid, int amount,  Gift gift) {

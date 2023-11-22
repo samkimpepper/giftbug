@@ -54,10 +54,5 @@ public class OpenbankingApiTestController {
         return new ResponseDto.Data<>(openbankingApi.depositAmount(dto.getAmount(), dto.getReqClientName(), dto.getReqClientBankCode(), dto.getReqClientAccountNum()));
     }
 
-    // TODO: 이거 왜 있는 거지
-    @GetMapping("/oauth2/openbanking/redirect")
-    public String authRedirect() {
-        return "openbanking-auth";
-    }
 
 }

@@ -14,6 +14,7 @@ import com.pretchel.pretchel0123jwt.modules.gift.dto.GiftCreateDto;
 import com.pretchel.pretchel0123jwt.modules.gift.dto.GiftListDto;
 import com.pretchel.pretchel0123jwt.modules.notification.event.GiftCompletedEvent;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +26,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class GiftService {
     private final GiftRepository giftRepository;
 
@@ -50,14 +52,12 @@ public class GiftService {
         giftRepository.save(gift);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public List<GiftListDto> getMyGifts(Event event) {
         List<Gift> gifts = giftRepository.findAllByEventId(event);
 
         return gifts.stream()
-                .map(gift -> {
-                    return GiftListDto.fromGift(gift);
-                })
+                .map(gift -> GiftListDto.fromGift(gift))
                 .collect(Collectors.toList());
     }
 
@@ -130,6 +130,12 @@ public class GiftService {
     public void setProcessState(Gift gift, ProcessState state) {
         gift.changeProcessState(state);
         giftRepository.save(gift);
+    }
+
+    public void syncSetProcessState(Gift gift, ProcessState state) {
+        gift = giftRepository.findByIdWithPessimisticLock(gift.getId()).orElseThrow();
+        gift.changeProcessState(state);
+        giftRepository.saveAndFlush(gift);
     }
 
     @Transactional

@@ -23,46 +23,18 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 public class MoveTask {
+    private final MoveTaskTransactional moveTaskTransactional;
     private final GiftRepository giftRepository;
-    private final CompletedGiftRepository completedGiftRepository;
-
-    private final MessageRepository messageRepository;
-
-    private final IamportPaymentRepository iamportPaymentRepository;
-
-    private final OpenbankingDepositRepository depositRepository;
 
     /*
-     *
      * state가 ongoing이 아니고, processState가 success인 애들 대상으로
      * Gift -> CompletedGift로 옮김.
-     *
-     *
      * */
-    @Transactional
     public void moveToCompletedGift() {
         List<Gift> gifts = giftRepository.findAllByStateNotInAndProcessStateIn(GiftState.ongoing, ProcessState.completed);
 
         for(Gift gift: gifts) {
-            CompletedGift completedGift = CompletedGift.fromGift(gift);
-            completedGiftRepository.save(completedGift);
-
-            List<Message> messages = messageRepository.findAllByGift(gift);
-            for(Message message: messages) {
-                message.moveToCompletedGift(completedGift);
-            }
-
-            List<IamportPayment> payments = iamportPaymentRepository.findAllByGift(gift);
-            for(IamportPayment payment: payments) {
-                payment.moveToCompletedGift(completedGift);
-            }
-
-            List<OpenbankingDeposit> deposits = depositRepository.findAllByGift(gift);
-            for(OpenbankingDeposit deposit: deposits) {
-                deposit.moveToCompletedGift(completedGift);
-            }
-
-            giftRepository.delete(gift);
+            moveTaskTransactional.moveToCompletedGift(gift);
         }
     }
 }

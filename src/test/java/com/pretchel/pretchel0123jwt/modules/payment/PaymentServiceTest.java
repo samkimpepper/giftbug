@@ -1,6 +1,7 @@
 package com.pretchel.pretchel0123jwt.modules.payment;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.pretchel.pretchel0123jwt.TestCleanup;
 import com.pretchel.pretchel0123jwt.modules.account.UserFactory;
 import com.pretchel.pretchel0123jwt.modules.account.domain.Users;
 import com.pretchel.pretchel0123jwt.modules.account.repository.UserRepository;
@@ -36,6 +37,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
 @SpringBootTest
+@TestCleanup
 public class PaymentServiceTest {
 
     @Autowired
@@ -112,14 +114,5 @@ public class PaymentServiceTest {
         gift = giftRepository.findAllByEvent(event).get(0);
         assertThat(gift.getFunded(), equalTo(300000));
     }
-    @AfterEach
-    public void clean() {
-        messageRepository.deleteAll();
-        paymentRepository.deleteAll();
-        giftRepository.deleteAll();
-        eventRepository.deleteAll();
-        addressAccountFactory.deleteAll();
-        notificationRepository.deleteAll();
-        userRepository.deleteAll();
-    }
+
 }

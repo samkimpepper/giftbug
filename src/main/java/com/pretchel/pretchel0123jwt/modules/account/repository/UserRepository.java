@@ -15,4 +15,7 @@ public interface UserRepository extends JpaRepository<Users, String> {
 
     @Query("select u from Users u left join fetch u.addresses where u.email = :email")
     Optional<Users> findByEmailFetchJoinAddresses(String email);
+
+    @Query("select u from Users u left join fetch u.addresses join fetch u.accounts where u.email = :email")
+    Optional<Users> findByEmailFetchJoinAccountsAndAddress(String email);
 }
