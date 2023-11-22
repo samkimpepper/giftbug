@@ -64,9 +64,10 @@ public class DepositTaskTestController {
                 .state(GiftState.expired)
                 .address(user.getDefaultAddress())
                 .build();
-        
+
         user = userRepository.findByEmailFetchJoinAccounts(email).orElseThrow();
-        user.setAccounts(List.of(user.getDefaultAccount()));
+        gift.setAccount(user.getDefaultAccount());
+
         giftRepository.save(gift);
         return new ResponseDto.Empty();
     }

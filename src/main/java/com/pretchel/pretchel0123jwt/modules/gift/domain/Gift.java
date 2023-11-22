@@ -82,6 +82,10 @@ public class Gift extends BaseTime {
     @Enumerated(EnumType.STRING)
     private ProcessState processState = ProcessState.none;
 
+    public void setAccount(Account account) {
+        this.account = account;
+    }
+
 
     public void changeState(GiftState state) {
         this.state = state;
