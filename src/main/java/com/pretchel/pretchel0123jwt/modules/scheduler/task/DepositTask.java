@@ -78,6 +78,7 @@ public class DepositTask {
         CompletableFuture<OpenbankingDeposit> depositFuture = CompletableFuture
                 .supplyAsync(() -> openbankingDepositService.preSave(finalNewBankTranId, gift, receiver))
                 .exceptionally(ex -> {
+                    log.error("preSave error:" + ex);
                     log.info("preSave()가 실패했으므로 종료");
                     return null;
                 });

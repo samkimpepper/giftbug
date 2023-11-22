@@ -16,6 +16,8 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -39,11 +41,25 @@ public class FindTask {
 
     @Transactional
     public void findExpiredGifts() {
-        giftQdslRepository.findByDeadLine()
-                .forEach(gift -> {
-                    giftService.expired(gift);
-                    eventPublisher.publishEvent(new GiftExpiredEvent(gift, gift.getEvent().getUsers()));
-                });
+        List<CompletableFuture<Void>> futures = giftQdslRepository.findByDeadLine()
+                .stream()
+                .map(gift -> CompletableFuture.runAsync(() -> {
+                    try {
+                        giftService.expired(gift);
+                        eventPublisher.publishEvent(new GiftExpiredEvent(gift, gift.getEvent().getUsers()));
+                    } catch (Exception ex) {
+                        log.error("findTask에서 예외 발생");
+                    }
+                }))
+                .collect(Collectors.toList());
+
+        CompletableFuture<Void> allOf = CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
+        CompletableFuture<Void> exceptionally = allOf.exceptionally(throwable -> {
+            // 예외가 발생했을 때 처리
+            return null; // 무시하고 계속 진행하도록 null을 반환
+        });
+
+        exceptionally.join();
     }
 
 }
