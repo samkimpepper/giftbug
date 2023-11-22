@@ -27,36 +27,44 @@ public class FindTask {
     private final GiftQdslRepository giftQdslRepository;
 
     private final FindTaskTransactional findTaskTransactional;
+    private final GiftService giftService;
 
-//    public void findExpiredGifts() {
-//        List<Gift> gifts = giftQdslRepository.findByDeadLineFetchJoin();
-//
-//        for(Gift gift: gifts) {
-//            giftService.expired(gift);
-//            eventPublisher.publishEvent(new GiftExpiredEvent(gift, gift.getEvent().getUsers()));
-//        }
-//    }
+    private final ApplicationEventPublisher eventPublisher;
+
 
     public void findExpiredGifts() {
+        List<Gift> gifts = giftQdslRepository.findByDeadLineFetchJoin();
 
-            List<Gift> gifts = giftQdslRepository.findByDeadLineFetchJoin();
+        for(Gift gift: gifts) {
+            try {
+                giftService.expired(gift);
+                eventPublisher.publishEvent(new GiftExpiredEvent(gift, gift.getEvent().getUsers()));
+            } catch (Exception ex) {
 
-            List<CompletableFuture<Void>> futures = gifts
-                    .stream()
-                    .map(gift -> CompletableFuture.runAsync(() -> {
-                        findTaskTransactional.markGiftAsExpired(gift);
-                    }))
-                    .collect(Collectors.toList());
-
-            CompletableFuture<Void> allOf = CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
-            CompletableFuture<Void> exceptionally = allOf.exceptionally(throwable -> {
-                log.error("exceptionally 에러:" + throwable);
-                // 예외가 발생했을 때 처리
-                return null; // 무시하고 계속 진행하도록 null을 반환
-            });
-
-            exceptionally.join();
+            }
+        }
     }
+
+//    public void findExpiredGifts() {
+//
+//            List<Gift> gifts = giftQdslRepository.findByDeadLineFetchJoin();
+//
+//            List<CompletableFuture<Void>> futures = gifts
+//                    .stream()
+//                    .map(gift -> CompletableFuture.runAsync(() -> {
+//                        findTaskTransactional.markGiftAsExpired(gift);
+//                    }))
+//                    .collect(Collectors.toList());
+//
+//            CompletableFuture<Void> allOf = CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
+//            CompletableFuture<Void> exceptionally = allOf.exceptionally(throwable -> {
+//                log.error("exceptionally 에러:" + throwable);
+//                // 예외가 발생했을 때 처리
+//                return null; // 무시하고 계속 진행하도록 null을 반환
+//            });
+//
+//            exceptionally.join();
+//    }
 
 //        public void findExpiredGifts() {
 //            while(true) {
