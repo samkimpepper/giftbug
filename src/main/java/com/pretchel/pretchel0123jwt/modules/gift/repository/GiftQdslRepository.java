@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+import static com.pretchel.pretchel0123jwt.modules.event.domain.QEvent.event;
 import static com.pretchel.pretchel0123jwt.modules.gift.domain.QGift.*;
 import static com.pretchel.pretchel0123jwt.modules.payments.message.QMessage.*;
 import static com.querydsl.core.types.ExpressionUtils.count;
@@ -21,6 +22,13 @@ public class GiftQdslRepository {
 
     public List<Gift> findByDeadLine() {
         return jpaQueryFactory.selectFrom(gift)
+                .where(Expressions.currentDate().after(gift.deadLine)).fetch();
+    }
+
+    public List<Gift> findByDeadLineFetchJoin() {
+        return jpaQueryFactory.selectFrom(gift)
+                .join(gift.event, event).fetchJoin()
+                .join(event.users, event.users).fetchJoin()
                 .where(Expressions.currentDate().after(gift.deadLine)).fetch();
     }
 

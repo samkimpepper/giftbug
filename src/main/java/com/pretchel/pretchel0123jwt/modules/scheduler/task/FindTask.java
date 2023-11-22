@@ -39,9 +39,8 @@ public class FindTask {
 //        }
 //    }
 
-    @Transactional
     public void findExpiredGifts() {
-        List<CompletableFuture<Void>> futures = giftQdslRepository.findByDeadLine()
+        List<CompletableFuture<Void>> futures = giftQdslRepository.findByDeadLineFetchJoin()
                 .stream()
                 .map(gift -> CompletableFuture.runAsync(() -> {
                     try {
@@ -53,13 +52,16 @@ public class FindTask {
                 }))
                 .collect(Collectors.toList());
 
-        CompletableFuture<Void> allOf = CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
-        CompletableFuture<Void> exceptionally = allOf.exceptionally(throwable -> {
-            // 예외가 발생했을 때 처리
-            return null; // 무시하고 계속 진행하도록 null을 반환
-        });
+            CompletableFuture<Void> allOf = CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
+            CompletableFuture<Void> exceptionally = allOf.exceptionally(throwable -> {
+                log.error("exceptionally 에러:" + throwable);
+                // 예외가 발생했을 때 처리
+                return null; // 무시하고 계속 진행하도록 null을 반환
+            });
 
-        exceptionally.join();
+            exceptionally.join();
     }
+
+
 
 }
