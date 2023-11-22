@@ -58,6 +58,7 @@ public class DepositTaskTestController {
                 .name("귀찮아")
                 .price(50000)
                 .link("귀찮")
+                .deadLine(date)
                 .giftImageUrl("ㅋㅋ")
                 .funded(funded)
                 .event(event)
