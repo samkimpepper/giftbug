@@ -30,7 +30,7 @@ public class GiftQdslRepository {
                 .join(gift.event, event).fetchJoin()
                 .join(event.users).fetchJoin()
                 .where(Expressions.currentDate().after(gift.deadLine))
-                .limit(1000)
+                .limit(100)
                 .fetch();
     }
 
