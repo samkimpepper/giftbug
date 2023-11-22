@@ -13,6 +13,7 @@ import com.pretchel.pretchel0123jwt.modules.scheduler.task.DepositTask;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -35,7 +37,7 @@ public class DepositTaskTestController {
     @GetMapping("/test/make")
     public ResponseDto.Empty testCreateEventAntGift(@RequestParam int funded) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        Users user = userRepository.findByEmailFetchJoinAccountsAndAddress(email).orElseThrow(NotFoundException::new);
+        Users user = userRepository.findByEmail(email).orElseThrow(NotFoundException::new);
         Date date = null;
         try {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
@@ -51,6 +53,7 @@ public class DepositTaskTestController {
                 .build();
         eventRepository.save(event);
 
+        user = userRepository.findByEmailFetchJoinAddresses(email).orElseThrow();
         Gift gift = Gift.builder()
                 .name("귀찮아")
                 .price(50000)
@@ -59,9 +62,11 @@ public class DepositTaskTestController {
                 .funded(funded)
                 .event(event)
                 .state(GiftState.expired)
-                .account(user.getDefaultAccount())
                 .address(user.getDefaultAddress())
                 .build();
+        
+        user = userRepository.findByEmailFetchJoinAccounts(email).orElseThrow();
+        user.setAccounts(List.of(user.getDefaultAccount()));
         giftRepository.save(gift);
         return new ResponseDto.Empty();
     }
