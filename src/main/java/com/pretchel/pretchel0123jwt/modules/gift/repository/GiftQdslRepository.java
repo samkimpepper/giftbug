@@ -29,7 +29,9 @@ public class GiftQdslRepository {
         return jpaQueryFactory.selectFrom(gift)
                 .join(gift.event, event).fetchJoin()
                 .join(event.users).fetchJoin()
-                .where(Expressions.currentDate().after(gift.deadLine)).fetch();
+                .where(Expressions.currentDate().after(gift.deadLine))
+                .limit(2000)
+                .fetch();
     }
 
 //    public List<Gift> findGiftsWithMostMessages() {
