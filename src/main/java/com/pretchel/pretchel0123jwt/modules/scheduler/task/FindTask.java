@@ -28,8 +28,7 @@ public class FindTask {
     private final GiftQdslRepository giftQdslRepository;
 
     private final ApplicationEventPublisher eventPublisher;
-
-    @Transactional
+    
     public void findExpiredGifts() {
         List<Gift> gifts = giftQdslRepository.findByDeadLineFetchJoin();
 
