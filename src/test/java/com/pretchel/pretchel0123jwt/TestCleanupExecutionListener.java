@@ -16,7 +16,5 @@ public class TestCleanupExecutionListener extends AbstractTestExecutionListener 
         jdbcTemplate.execute("SET REFERENTIAL_INTEGRITY FALSE");
         truncateQueries.forEach(jdbcTemplate::execute);
         jdbcTemplate.execute("SET REFERENTIAL_INTEGRITY TRUE");
-
     }
-
 }
