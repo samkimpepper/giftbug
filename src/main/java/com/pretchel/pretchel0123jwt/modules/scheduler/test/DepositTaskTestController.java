@@ -63,6 +63,7 @@ public class DepositTaskTestController {
                 .funded(funded)
                 .event(event)
                 .state(GiftState.expired)
+                .story("스토리")
                 .address(user.getDefaultAddress())
                 .build();
 
